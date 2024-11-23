@@ -38,7 +38,7 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
   const session: any = useSession();
-  const appUser: any = session.data.user;
+  const appUser: any = session?.data?.user || {};
 
   const onClickLogout = () => {
     signOut({ callbackUrl: "/signin" });
