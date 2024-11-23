@@ -36,8 +36,8 @@ const data = {
       isActive: true,
       items: [
         {
-          title: "Apartments",
-          url: "/apartments",
+          title: "Flats",
+          url: "/flats",
         },
         {
           title: "Owners",

@@ -34,7 +34,7 @@ export default function DashboardLayout({
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Apartments</BreadcrumbPage>
+                  <BreadcrumbPage>Flats</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>

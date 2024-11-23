@@ -21,7 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { CalendarIcon } from "lucide-react";
 
 // Sample apartment data
-const apartments = [
+const records = [
   {
     id: 1,
     apartmentNo: "A101",
@@ -68,12 +68,12 @@ export default function OwnersTable() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const filteredRecords = apartments.filter((apartment) => {
+  const filteredRecords = records.filter((record) => {
     const matchesSearch =
-      apartment.apartmentNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      apartment.ownerName.toLowerCase().includes(searchTerm.toLowerCase());
+      record.apartmentNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      record.ownerName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus =
-      statusFilter === "all" || apartment.status === statusFilter;
+      statusFilter === "all" || record.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
