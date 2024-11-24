@@ -1,9 +1,10 @@
 import React from "react";
-import Table from "./payment-table";
 import { sql } from "@vercel/postgres";
 
-export default async function PaymentPage() {
-  const { rows: data } = await sql`select *from payments`;
+import Table from "./resident-table";
+
+export default async function ResidentsPage() {
+  const { rows: data } = await sql`select *from residents`;
   console.log(data);
 
   return (

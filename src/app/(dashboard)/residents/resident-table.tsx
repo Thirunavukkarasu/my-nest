@@ -32,65 +32,61 @@ export const columns: ColumnDef<any>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "flat_number",
-    header: "Flat No",
+    accessorKey: "first_name",
+    header: "First Name",
     cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("flat_number")}</div>
+      <div className="font-medium">{row.getValue("first_name")}</div>
     ),
   },
   {
-    accessorKey: "first_name",
-    header: "Name",
+    accessorKey: "last_name",
+    header: "Last Name",
     cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("first_name") ?? ""}</div>
+      <div>{row.getValue("last_name")}</div>
     ),
   },
   {
     accessorKey: "email",
     header: "Email",
+    cell: ({ row }) => (
+      <div className="truncate w-40" title={row.getValue("email")}>
+        {row.getValue("email")}
+      </div>
+    ),
   },
   {
     accessorKey: "phone",
     header: "Phone",
   },
   {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }:any) => (
-      <div className={`capitalize ${row.getValue("status").toLowerCase()}`}>
-        {row.getValue("status")}
-      </div>
+    accessorKey: "lease_start_date",
+    header: "Lease Start Date",
+    cell: ({ row }) => (
+      <div>{new Date(row.getValue("lease_start_date")).toLocaleDateString()}</div>
     ),
   },
   {
-    accessorKey: "monthly_rent",
-    header: "Monthly Rent (INR)",
+    accessorKey: "lease_end_date",
+    header: "Lease End Date",
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("monthly_rent"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "INR",
-      }).format(amount);
-      return <div>{formatted}</div>;
+      const endDate:any = row.getValue("lease_end_date");
+      return endDate
+        ? <div>{new Date(endDate).toLocaleDateString()}</div>
+        : <div>-</div>;
     },
   },
   {
-    accessorKey: "monthly_maintenance_charge",
-    header: "Maintenance Charge (INR)",
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("monthly_maintenance_charge"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "INR",
-      }).format(amount);
-      return <div>{formatted}</div>;
-    },
+    accessorKey: "is_primary_tenant",
+    header: "Primary Tenant",
+    cell: ({ row }) => (
+      <div>{row.getValue("is_primary_tenant") ? "Yes" : "No"}</div>
+    ),
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const flat = row.original;
+      const resident = row.original;
 
       return (
         <DropdownMenu>
@@ -102,9 +98,9 @@ export const columns: ColumnDef<any>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>View flat details</DropdownMenuItem>
-            <DropdownMenuItem>Edit flat</DropdownMenuItem>
-            <DropdownMenuItem>Delete flat</DropdownMenuItem>
+            <DropdownMenuItem>View resident</DropdownMenuItem>
+            <DropdownMenuItem>Edit resident</DropdownMenuItem>
+            <DropdownMenuItem>Delete resident</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -112,6 +108,6 @@ export const columns: ColumnDef<any>[] = [
   },
 ];
 
-export default function FlatsTable({ data }: { data: any[] }) {
+export default function ResidentsTable({ data }: { data: any[] }) {
   return <GridTable data={data} columns={columns} />;
 }

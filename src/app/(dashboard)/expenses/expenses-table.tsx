@@ -32,66 +32,57 @@ export const columns: ColumnDef<any>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "flat_number",
-    header: "Flat No",
+    accessorKey: "expense_date",
+    header: "Expense Date",
     cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("flat_number")}</div>
+      <div>{new Date(row.getValue("expense_date")).toLocaleDateString()}</div>
     ),
   },
   {
-    accessorKey: "first_name",
-    header: "Name",
+    accessorKey: "category",
+    header: "Category",
     cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("first_name") ?? ""}</div>
+      <div className="capitalize">{row.getValue("category")}</div>
     ),
   },
   {
-    accessorKey: "email",
-    header: "Email",
+    accessorKey: "description",
+    header: "Description",
   },
   {
-    accessorKey: "phone",
-    header: "Phone",
+    accessorKey: "amount",
+    header: "Amount",
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("amount"));
+      const formatted = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "INR",
+      }).format(amount);
+  
+      return <div className="font-medium">{formatted}</div>;
+    },
+  },
+  {
+    accessorKey: "paid_by",
+    header: "Paid By",
+  },
+  {
+    accessorKey: "payment_method",
+    header: "Payment Method",
   },
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }:any) => (
-      <div className={`capitalize ${row.getValue("status").toLowerCase()}`}>
-        {row.getValue("status")}
-      </div>
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("status")}</div>
     ),
-  },
-  {
-    accessorKey: "monthly_rent",
-    header: "Monthly Rent (INR)",
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("monthly_rent"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "INR",
-      }).format(amount);
-      return <div>{formatted}</div>;
-    },
-  },
-  {
-    accessorKey: "monthly_maintenance_charge",
-    header: "Maintenance Charge (INR)",
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("monthly_maintenance_charge"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "INR",
-      }).format(amount);
-      return <div>{formatted}</div>;
-    },
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const flat = row.original;
-
+      const expense = row.original;
+  
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -102,9 +93,9 @@ export const columns: ColumnDef<any>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>View flat details</DropdownMenuItem>
-            <DropdownMenuItem>Edit flat</DropdownMenuItem>
-            <DropdownMenuItem>Delete flat</DropdownMenuItem>
+            <DropdownMenuItem>View details</DropdownMenuItem>
+            <DropdownMenuItem>Edit expense</DropdownMenuItem>
+            <DropdownMenuItem>Delete expense</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -112,6 +103,6 @@ export const columns: ColumnDef<any>[] = [
   },
 ];
 
-export default function FlatsTable({ data }: { data: any[] }) {
+export default function ExpensesTable({ data }: { data: any[] }) {
   return <GridTable data={data} columns={columns} />;
 }

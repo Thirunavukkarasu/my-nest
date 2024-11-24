@@ -44,8 +44,23 @@ CREATE TABLE Payments (
     reference_number VARCHAR(100),           -- Reference number for tracking the transaction
     notes TEXT,                              -- Additional notes or remarks about the payment
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (flat_id) REFERENCES Flats(flat_id) ON DELETE CASCADE
+);
+
+-- Create Expenses table
+CREATE TABLE expenses (
+    expense_id BIGSERIAL PRIMARY KEY,
+    expense_date DATE NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    description TEXT,
+    amount DECIMAL(10, 2) NOT NULL,
+    paid_by VARCHAR(100),
+    payment_method VARCHAR(50),
+    receipt_url VARCHAR(255),
+    status VARCHAR(20) CHECK (status IN ('Pending', 'Paid')) DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 

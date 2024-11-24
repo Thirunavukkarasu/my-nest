@@ -40,16 +40,16 @@ const data = {
           url: "/flats",
         },
         {
-          title: "Owners",
-          url: "/owners",
-        },
-        {
-          title: "Tenants",
-          url: "/tenants",
+          title: "Residents",
+          url: "/residents",
         },
         {
           title: "Payments",
           url: "/payments",
+        },
+        {
+          title: "Expenses",
+          url: "/expenses",
         },
       ],
     },
