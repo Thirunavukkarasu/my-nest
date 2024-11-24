@@ -41,8 +41,8 @@ export function LoginForm() {
       if (result?.error) {
         setError("Invalid email or password");
         toast({
-          title: "Sign Up Failed",
-          description: "There was an error signing up. Please try again.",
+          title: "Login Failed",
+          description: "There was an error login. Please try again.",
           variant: "destructive",
         });
       } else {
@@ -51,8 +51,8 @@ export function LoginForm() {
     } catch (error) {
       setError("An error occurred. Please try again.");
       toast({
-        title: "Sign Up Failed",
-        description: "There was an error signing up. Please try again.",
+        title: "Login Failed",
+        description: "There was an error login. Please try again.",
         variant: "destructive",
       });
     }

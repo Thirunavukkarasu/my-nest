@@ -24,11 +24,11 @@ const handler = NextAuth({
                     return null;
                 }
 
-                // const passwordMatch = await compare(credentials.password, rows[0].password);
+                const passwordMatch = await compare(credentials.password, rows[0].password);
 
-                // if (!passwordMatch) {
-                //     return null;
-                // }
+                if (!passwordMatch) {
+                    return null;
+                }
 
                 return {
                     id: rows[0].id,
