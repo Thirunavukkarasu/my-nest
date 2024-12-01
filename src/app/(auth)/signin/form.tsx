@@ -23,10 +23,6 @@ export function LoginForm() {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  // const onClickLogin = () => {
-  //   router.push("/home");
-  // };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -46,7 +42,7 @@ export function LoginForm() {
           variant: "destructive",
         });
       } else {
-        router.push("/home"); // Redirect to dashboard on successful login
+        router.push("/dashboard"); // Redirect to dashboard on successful login
       }
     } catch (error) {
       setError("An error occurred. Please try again.");
