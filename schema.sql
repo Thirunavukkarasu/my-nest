@@ -65,3 +65,30 @@ CREATE TABLE expenses (
 
 
 select *from flats left join residents on flats.flat_id = residents.flat_id;
+
+-- Create Users table
+CREATE TABLE users(
+    id SERIAL NOT NULL,
+    name varchar(255) NOT NULL,
+    email varchar(255) NOT NULL,
+    password varchar(255) NOT NULL,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY(id)
+);
+
+-- Create Expenses table
+CREATE TABLE expenses(
+    expense_id SERIAL NOT NULL,
+    expense_date date NOT NULL,
+    category varchar(50) NOT NULL,
+    description text,
+    amount numeric(10,2) NOT NULL,
+    paid_by varchar(100),
+    payment_method varchar(50),
+    receipt_url varchar(255),
+    status varchar(20) DEFAULT 'Pending'::character varying,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY(expense_id),
+    CONSTRAINT expenses_status_check CHECK (((status)::text = ANY ((ARRAY['Pending'::character varying, 'Paid'::character varying])::text[])))
+);
