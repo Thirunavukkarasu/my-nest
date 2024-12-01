@@ -1,6 +1,4 @@
-import { flatsTable } from '@/db/schema';
 import { SQL, SQLWrapper, and, asc, desc, eq, gte, ilike, lte, or, sql } from 'drizzle-orm';
-import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
 interface SearchCriteria {
     columnName: string;
@@ -33,7 +31,7 @@ interface PaginationResult<T> {
 }
 
 const customPaginate = async <T>(
-    db: PostgresJsDatabase,
+    db: any,
     table: any,
     options: PaginateOptions = {}
 ): Promise<PaginationResult<T>> => {
