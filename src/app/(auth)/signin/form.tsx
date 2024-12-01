@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { signIn } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,9 +15,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { signIn } from "next-auth/react";
 import { toast } from "@/hooks/use-toast";
 
 export function LoginForm() {
@@ -61,6 +61,7 @@ export function LoginForm() {
         <CardDescription>
           Enter your email below to login to your account
         </CardDescription>
+        {error && <div className="text-red-500 text-sm">{error}</div>}
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
