@@ -4,10 +4,10 @@ Manage aparments and tenants in a building with this my-nest application.
 
 # Features
 
-- Add a new apartment
-- Add a new tenant
-- List all apartments
-- List all tenants
+- Add a new flats
+- Add a new residents
+- List all flats
+- List all residents
 - Manage Payments
 - Manage Maintenance Requests
 - Manage Complaints
@@ -38,4 +38,15 @@ npm install
 
 ```bash
 npm run dev
+```
+
+4. Open the browser and navigate to `http://localhost:3000`
+
+# Environment Variables
+
+Create a `.env.local` file in the root of the project and add the following environment variables
+
+```bash
+POSTGRES_URL=
+NEXTAUTH_SECRET=
 ```
