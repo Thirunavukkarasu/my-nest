@@ -1,7 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { GalleryVerticalEnd, SquareTerminal } from "lucide-react";
+import {
+  GalleryVerticalEnd,
+  LayoutDashboardIcon,
+  SquareTerminal,
+} from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -31,27 +35,28 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/dashboard",
+      icon: LayoutDashboardIcon,
+    },
+    {
+      title: "Flats",
+      url: "/flats",
       icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "Flats",
-          url: "/flats",
-        },
-        {
-          title: "Residents",
-          url: "/residents",
-        },
-        {
-          title: "Payments",
-          url: "/payments",
-        },
-        {
-          title: "Expenses",
-          url: "/expenses",
-        },
-      ],
+    },
+    {
+      title: "Residents",
+      url: "/residents",
+      icon: SquareTerminal,
+    },
+    {
+      title: "Payments",
+      url: "/payments",
+      icon: SquareTerminal,
+    },
+    {
+      title: "Expenses",
+      url: "/expenses",
+      icon: SquareTerminal,
     },
   ],
 };
@@ -63,7 +68,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain navMain={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

@@ -1,51 +1,36 @@
-'use client';
+"use client";
 
-import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal } from 'lucide-react';
+import { ColumnDef } from "@tanstack/react-table";
+import { MoreHorizontal } from "lucide-react";
 
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import GridTable from '@/components/grid-table';
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { IndiGrid } from "@/components/indi-grid";
+import { dateTimeFormatter } from "@/components/indi-grid/grid-formatters";
 
 export const columns: ColumnDef<any>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "payment_date",
+    accessorKey: "paymentDate",
     header: "Payment Date",
-    cell: ({ row }) => (
-      <div>{new Date(row.getValue("payment_date")).toLocaleDateString()}</div>
-    ),
+    cell: dateTimeFormatter,
   },
   {
     accessorKey: "due_date",
     header: "Due Date",
     cell: ({ row }) => {
-      const dueDate:any = row.getValue("due_date");
-      return dueDate
-        ? <div>{new Date(dueDate).toLocaleDateString()}</div>
-        : <div>-</div>;
+      const dueDate: any = row.getValue("due_date");
+      return dueDate ? (
+        <div>{new Date(dueDate).toLocaleDateString()}</div>
+      ) : (
+        <div>-</div>
+      );
     },
   },
   {
@@ -70,8 +55,8 @@ export const columns: ColumnDef<any>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }:any) => (
-      <div className={`capitalize ${row.getValue("status").toLowerCase()}`}>
+    cell: ({ row }: any) => (
+      <div className={`capitalize ${row.getValue("status")?.toLowerCase()}`}>
         {row.getValue("status")}
       </div>
     ),
@@ -119,6 +104,6 @@ export const columns: ColumnDef<any>[] = [
   },
 ];
 
-export default function PaymentsTable({ data }: { data: any[] }) {
-  return <GridTable data={data} columns={columns} />;
+export default function PaymentsTable() {
+  return <IndiGrid columns={columns} gridUrl="/api/payments" />;
 }

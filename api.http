@@ -7,3 +7,91 @@ content-type: application/json
     "password": ""
 }
 
+### Get all flats
+
+POST http://localhost:3000/api/flats HTTP/1.1
+content-type: application/json
+
+{
+   "page": 1,
+   "limit": 10,
+   "searchCriterias": [
+         {
+              "columnName": "flatNumber",
+              "columnOperator": "contains",
+              "columnValue": "G"
+         }
+   ],
+    "sortCriterias": [{
+        "columnName": "createdAt",
+        "columnOrder": "desc"
+    }]
+}
+
+### Create a flat
+
+POST http://localhost:3000/api/flats/create HTTP/1.1
+content-type: application/json
+
+{
+    "floorNumber": 1,
+    "flatNumber": "G003"
+}
+
+### Get all Residents
+
+POST http://localhost:3000/api/residents HTTP/1.1
+content-type: application/json
+
+{
+   "page": 1,
+   "limit": 10,
+   "searchCriterias": [
+     
+   ],
+    "sortCriterias": [{
+        "columnName": "createdAt",
+        "columnOrder": "desc"
+    }]
+}
+
+### Create a resident
+
+POST http://localhost:3000/api/residents/create HTTP/1.1
+content-type: application/json
+
+{
+    "flatId": 2,
+    "firstName": "Mithlesh",
+    "lastName": "Kumar",
+    "email": "mithlesh.kumar@gmail.com",
+    "leaseStartDate": "2021-09-01"
+}
+
+### Get all Payments
+
+POST http://localhost:3000/api/payments HTTP/1.1
+content-type: application/json
+
+{
+   "page": 1,
+   "limit": 10,
+   "searchCriterias": [
+     
+   ],
+    "sortCriterias": [{
+        "columnName": "createdAt",
+        "columnOrder": "desc"
+    }]
+}
+
+### Create a payment
+
+POST http://localhost:3000/api/payments/create HTTP/1.1
+content-type: application/json
+
+{
+    "flatId": 2,
+    "amount": 1000,
+    "paymentDate": "2021-09-01"
+}

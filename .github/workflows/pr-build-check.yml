@@ -1,0 +1,43 @@
+name: PR Build Check
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build and Test Next.js App
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18" # Specify your Node.js version
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Run linting
+      #   - name: Lint code
+      #     run: npm run lint
+
+      #   # Run tests
+      #   - name: Run tests
+      #     run: npm test
+
+      # Build the Next.js app
+      - name: Build Next.js app
+        run: npm run build
+
+    #   # Run Next.js type check (optional)
+    #   - name: Run TypeScript type check
+    #     run: npm run type-check

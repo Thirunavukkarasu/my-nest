@@ -2,7 +2,7 @@ import { pgTable, serial, varchar, integer, decimal, boolean, timestamp, date, t
 import { relations } from "drizzle-orm";
 
 // Flats Table
-export const flats = pgTable("flats", {
+export const flatsTable = pgTable("flats", {
     flatId: serial("flat_id").primaryKey(),
     flatNumber: varchar("flat_number", { length: 10 }).notNull().unique(),
     floorNumber: integer("floor_number").notNull(),
@@ -18,9 +18,9 @@ export const flats = pgTable("flats", {
 });
 
 // Residents Table
-export const residents = pgTable("residents", {
+export const residentsTable = pgTable("residents", {
     residentId: serial("resident_id").primaryKey(),
-    flatId: integer("flat_id").notNull().references(() => flats.flatId, { onDelete: "cascade" }),
+    flatId: integer("flat_id").notNull().references(() => flatsTable.flatId, { onDelete: "cascade" }),
     firstName: varchar("first_name", { length: 50 }).notNull(),
     lastName: varchar("last_name", { length: 50 }).notNull(),
     email: varchar("email", { length: 100 }).unique(),
@@ -33,9 +33,9 @@ export const residents = pgTable("residents", {
 });
 
 // Payments Table
-export const payments = pgTable("payments", {
+export const paymentsTable = pgTable("payments", {
     paymentId: serial("payment_id").primaryKey(),
-    flatId: integer("flat_id").notNull().references(() => flats.flatId, { onDelete: "cascade" }),
+    flatId: integer("flat_id").notNull().references(() => flatsTable.flatId, { onDelete: "cascade" }),
     paymentType: varchar("payment_type", { length: 20 }),
     amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
     paymentDate: date("payment_date").notNull(),
@@ -49,21 +49,21 @@ export const payments = pgTable("payments", {
 });
 
 // Define Relationships
-export const flatsRelations = relations(flats, ({ many }) => ({
-    residents: many(residents),
-    payments: many(payments),
+export const flatsRelations = relations(flatsTable, ({ many }) => ({
+    residents: many(residentsTable),
+    payments: many(paymentsTable),
 }));
 
-export const residentsRelations = relations(residents, ({ one }) => ({
-    flat: one(flats, { fields: [residents.flatId], references: [flats.flatId] }),
+export const residentsRelations = relations(residentsTable, ({ one }) => ({
+    flat: one(flatsTable, { fields: [residentsTable.flatId], references: [flatsTable.flatId] }),
 }));
 
-export const paymentsRelations = relations(payments, ({ one }) => ({
-    flat: one(flats, { fields: [payments.flatId], references: [flats.flatId] }),
+export const paymentsRelations = relations(paymentsTable, ({ one }) => ({
+    flat: one(flatsTable, { fields: [paymentsTable.flatId], references: [flatsTable.flatId] }),
 }));
 
 // Users table schema
-export const users = pgTable('users', {
+export const usersTable = pgTable('users', {
     id: serial('id').notNull().primaryKey(),
     name: varchar('name', { length: 255 }).notNull(),
     email: varchar('email', { length: 255 }).notNull(),
@@ -73,7 +73,7 @@ export const users = pgTable('users', {
 });
 
 // Expenses table schema
-export const expenses = pgTable('expenses', {
+export const expensesTable = pgTable('expenses', {
     expenseId: serial('expense_id').notNull().primaryKey(),
     expenseDate: date('expense_date').notNull(),
     category: varchar('category', { length: 50 }).notNull(),

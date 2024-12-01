@@ -1,41 +1,24 @@
-'use client';
+"use client";
 
-import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal } from 'lucide-react';
+import { ColumnDef } from "@tanstack/react-table";
+import { MoreHorizontal } from "lucide-react";
 
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import GridTable from '@/components/grid-table';
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { IndiGrid } from "@/components/indi-grid";
 
 export const columns: ColumnDef<any>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
   {
     accessorKey: "expense_date",
     header: "Expense Date",
     cell: ({ row }) => (
-      <div>{new Date(row.getValue("expense_date")).toLocaleDateString()}</div>
+      <div>{new Date(row.getValue("expense_date"))?.toLocaleDateString()}</div>
     ),
   },
   {
@@ -58,7 +41,7 @@ export const columns: ColumnDef<any>[] = [
         style: "currency",
         currency: "INR",
       }).format(amount);
-  
+
       return <div className="font-medium">{formatted}</div>;
     },
   },
@@ -82,7 +65,7 @@ export const columns: ColumnDef<any>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const expense = row.original;
-  
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -103,6 +86,6 @@ export const columns: ColumnDef<any>[] = [
   },
 ];
 
-export default function ExpensesTable({ data }: { data: any[] }) {
-  return <GridTable data={data} columns={columns} />;
+export default function ExpensesTable() {
+  return <IndiGrid columns={columns} gridUrl="/api/payments" />;
 }

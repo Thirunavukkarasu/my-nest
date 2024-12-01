@@ -16,10 +16,8 @@ const handler = NextAuth({
                 }
 
                 const { rows } = await sql`
-          SELECT * FROM users WHERE email=${credentials.email}
-        `;
-
-                console.log('user', rows);
+                    SELECT * FROM users WHERE email=${credentials.email}
+                `;
                 if (!rows[0]) {
                     return null;
                 }
