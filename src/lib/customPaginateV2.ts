@@ -1,6 +1,4 @@
-import { relations } from '@/db/schema';
 import { SQL, SQLWrapper, and, asc, desc, eq, gte, ilike, lte, or, sql } from 'drizzle-orm';
-import { PgTableWithColumns } from 'drizzle-orm/pg-core';
 
 interface SearchCriteria {
     columnName: string;
@@ -41,9 +39,9 @@ interface PaginationResult<T> {
     };
 }
 
-const customPaginate = async <T>(
+const customPaginateV2 = async <T>(
     db: any,
-    table: PgTableWithColumns<any>,
+    table: any,
     options: PaginateOptions = {}
 ): Promise<PaginationResult<T>> => {
     const {
@@ -65,16 +63,46 @@ const customPaginate = async <T>(
     let query: any = db.select();
 
     const autoJoins: JoinOptions[] = [];
-    // if (populate === '*' || (Array.isArray(populate) && populate.length > 0)) {
-    //     const tableRelations = relations[table.tableName];
-    //     console.log('relations', tableRelations, table.tableName);
-    // }
+    if (populate === '*' || (Array.isArray(populate) && populate.length > 0)) {
+        const relations = table.relations;
+        for (const [relationName, relation] of Object.entries(relations)) {
+            if (populate === '*' || populate.includes(relationName)) {
+                autoJoins.push({
+                    table: (relation as any).table,
+                    on: eq(table[(relation as any).fields[0]], (relation as any).table[(relation as any).references[0]]),
+                    type: 'left',
+                    select: Object.keys((relation as any).table.columns),
+                });
+            }
+        }
+    }
+
+    const allJoins = [...joins, ...autoJoins];
+
+    allJoins.forEach(join => {
+        const joinMethod = join.type ? `${join.type}Join` : 'innerJoin';
+        query = query[joinMethod](join.table, join.on);
+    });
 
     query = query.from(table);
 
     // Apply column selection if specified
     if (select && select.length > 0) {
-        query = query.select(select.map(col => table[col]));
+        const selectColumns = select.map(col => table[col]);
+        allJoins.forEach(join => {
+            if (join.select) {
+                selectColumns.push(...join.select.map(col => join.table[col]));
+            }
+        });
+        query = query.select(selectColumns);
+    } else {
+        const selectColumns = Object.keys(table.columns).map(col => table[col]);
+        allJoins.forEach(join => {
+            if (join.select) {
+                selectColumns.push(...join.select.map(col => join.table[col]));
+            }
+        });
+        query = query.select(selectColumns);
     }
 
     // Apply filters dynamically
@@ -137,6 +165,11 @@ const customPaginate = async <T>(
     // Clone query for total count before applying pagination
     const countQuery = db.select({ count: sql`count(*)` }).from(table);
 
+    allJoins.forEach(join => {
+        const joinMethod = join.type ? `${join.type}Join` : 'innerJoin';
+        countQuery[joinMethod](join.table, join.on);
+    });
+
     // Apply pagination
     query = query.limit(pageSize).offset(offset);
 
@@ -162,4 +195,4 @@ const customPaginate = async <T>(
     };
 };
 
-export { customPaginate };
+export { customPaginateV2 };

@@ -12,11 +12,15 @@ export async function POST(req: Request) {
             limit,
             searchCriterias,
             sortCriterias,
+            populate: '*'
         });
 
         return NextResponse.json(result, { status: 200 });
-    } catch (error) {
-        console.error('Error while getting data', error);
-        return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
+    } catch (error: any) {
+        console.error('Error while getting data: ', error);
+        return NextResponse.json({
+            message: "Error while getting data",
+            error: error.message
+        }, { status: 500 });
     }
 }

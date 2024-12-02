@@ -18,6 +18,7 @@ export const columns: ColumnDef<any>[] = [
   {
     accessorKey: "paymentDate",
     header: "Payment Date",
+    size: 200,
     cell: dateTimeFormatter,
   },
   {
