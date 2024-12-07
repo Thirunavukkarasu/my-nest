@@ -1,164 +1,96 @@
-import { relations } from '@/db/schema';
-import { SQL, SQLWrapper, and, asc, desc, eq, gte, ilike, lte, or, sql } from 'drizzle-orm';
-import { PgTableWithColumns } from 'drizzle-orm/pg-core';
+import { PgTableWithColumns } from "drizzle-orm/pg-core";
+import { applyPagination, applySearchCriterias, applySelect, applySorting, PaginateOptions, QueryBuilder } from "./commonGrid";
+import { and, or, sql } from "drizzle-orm";
 
-interface SearchCriteria {
-    columnName: string;
-    columnOperator: string;
-    columnValue: string | number;
-    isOrCondition?: boolean;
-}
-
-interface SortCriteria {
-    columnName: string;
-    columnOrder?: 'asc' | 'desc';
-}
-
-interface JoinOptions {
-    table: any;
-    on: SQL;
-    type?: 'inner' | 'left' | 'right' | 'full';
-    select?: string[];
-}
-
-interface PaginateOptions {
-    page?: number;
-    limit?: number;
-    searchCriterias?: SearchCriteria[];
-    sortCriterias?: SortCriteria[];
-    select?: string[];
-    joins?: JoinOptions[];
-    populate?: '*' | string[];
-}
-
-interface PaginationResult<T> {
-    docs: T[];
-    pagination: {
-        total: number;
-        page: number;
-        limit: number;
-        totalPages: number;
-    };
-}
-
-const customPaginate = async <T>(
+// Main Paginate Function
+const customPaginate = <T>(
     db: any,
-    table: PgTableWithColumns<any>,
+    tableName: string,
+    table: any,
     options: PaginateOptions = {}
-): Promise<PaginationResult<T>> => {
+): QueryBuilder<T> => {
     const {
         page = 1,
         limit = 10,
         searchCriterias = [],
         sortCriterias = [],
         select,
-        joins = [],
-        populate,
+        with: relations
     } = options;
 
-    // Parse pagination params
-    const pageNumber = parseInt(page.toString(), 10);
-    const pageSize = parseInt(limit.toString(), 10);
-    const offset = (pageNumber - 1) * pageSize;
+    // Apply pagination, search, and sorting dynamically
+    const { pageSize, offset } = applyPagination(page, limit);
+    const whereConditions = applySearchCriterias(table, searchCriterias);
+    const orderByConditions = applySorting(table, sortCriterias);
+    const selectColumns = applySelect(select || [], table);
 
     // Build the base query
-    let query: any = db.select();
-
-    const autoJoins: JoinOptions[] = [];
-    // if (populate === '*' || (Array.isArray(populate) && populate.length > 0)) {
-    //     const tableRelations = relations[table.tableName];
-    //     console.log('relations', tableRelations, table.tableName);
-    // }
-
-    query = query.from(table);
+    let query: any = db.select().from(table);
 
     // Apply column selection if specified
-    if (select && select.length > 0) {
-        query = query.select(select.map(col => table[col]));
+    if (selectColumns) {
+        query = query.select(selectColumns);
     }
 
     // Apply filters dynamically
-    if (searchCriterias.length > 0) {
-        const conditions: SQLWrapper[] = searchCriterias.map(({ columnName, columnOperator, columnValue, isOrCondition }) => {
-            // Ensure the columnName exists on the table dynamically
-            if (!table[columnName]) {
-                throw new Error(`Invalid column name: ${columnName}`);
-            }
-            let condition: SQL;
-            switch (columnOperator.toLowerCase()) {
-                case 'contains':
-                    condition = ilike(table[columnName], `%${columnValue}%`);
-                    break;
-                case 'equals':
-                    condition = eq(table[columnName], columnValue);
-                    break;
-                case 'startswith':
-                    condition = ilike(table[columnName], `${columnValue}%`);
-                    break;
-                case 'endswith':
-                    condition = ilike(table[columnName], `%${columnValue}`);
-                    break;
-                case 'gte':
-                    condition = gte(table[columnName], columnValue);
-                    break;
-                case 'lte':
-                    condition = lte(table[columnName], columnValue);
-                    break;
-                default:
-                    throw new Error(`Unsupported operator: ${columnOperator}`);
-            }
-            return condition;
-        });
-
-        if (conditions.length > 1) {
-            query = query.where(searchCriterias.some(sc => sc.isOrCondition) ? or(...conditions) : and(...conditions));
-        } else {
-            query = query.where(conditions[0]);
-        }
+    if (whereConditions.length > 0) {
+        query = query.where(searchCriterias.some(sc => sc.isOrCondition) ? or(...whereConditions) : and(...whereConditions));
     }
 
     // Apply sorting dynamically
-    if (sortCriterias.length > 0) {
-        query = query.orderBy(
-            ...sortCriterias.map(({ columnName, columnOrder }) => {
-                // Ensure the columnName exists on the table dynamically
-                if (!table[columnName]) {
-                    throw new Error(`Invalid column name: ${columnName}`);
-                }
-
-                // Return the correct sort direction
-                return columnOrder === 'desc'
-                    ? desc(table[columnName])
-                    : asc(table[columnName]);
-            })
-        );
+    if (orderByConditions.length > 0) {
+        query = query.orderBy(...orderByConditions);
     }
 
-    // Clone query for total count before applying pagination
+    // Create count query
     const countQuery = db.select({ count: sql`count(*)` }).from(table);
+
+    if (whereConditions.length > 0) {
+        countQuery.where(
+            searchCriterias.some(sc => sc.isOrCondition)
+                ? or(...whereConditions)
+                : and(...whereConditions)
+        );
+    }
 
     // Apply pagination
     query = query.limit(pageSize).offset(offset);
 
-    // Execute both queries
-    const [docs, [countResult]] = await Promise.all([
-        query,
-        countQuery
-    ]);
-
-    // Calculate metadata
-    const total = Number(countResult.count);
-    const totalPages = Math.ceil(total / pageSize);
-
-    // Return data and pagination metadata
+    // Return the query builder object
     return {
-        docs,
-        pagination: {
-            total,
-            page: pageNumber,
-            limit: pageSize,
-            totalPages,
-        },
+        query,
+        countQuery,
+        execute: async () => {
+            let finalQuery: any;
+            if (relations) {
+                finalQuery = db.query[tableName].findMany({
+                    limit: pageSize,
+                    offset: offset,
+                    with: relations,
+                    where: searchCriterias.some(sc => sc.isOrCondition)
+                        ? or(...whereConditions)
+                        : and(...whereConditions),
+                    orderBy: orderByConditions.length > 0 ? orderByConditions : undefined,
+                });
+
+            } else {
+                finalQuery = query;
+            }
+
+            const [docs, countResult] = await Promise.all([finalQuery, countQuery]);
+            const total = Number(countResult[0]?.count || 0);
+            const totalPages = Math.ceil(total / pageSize);
+
+            return {
+                docs,
+                pagination: {
+                    total,
+                    page,
+                    limit: pageSize,
+                    totalPages,
+                },
+            };
+        }
     };
 };
 

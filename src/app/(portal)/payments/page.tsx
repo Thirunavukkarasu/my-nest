@@ -1,4 +1,6 @@
+import { Button } from "@/components/ui/button";
 import PaymentTable from "./payment-table";
+import Link from "next/link";
 
 export default async function Payments() {
   return (
@@ -9,6 +11,12 @@ export default async function Payments() {
           <p className="text-muted-foreground">
             View and manage all payments made by residents
           </p>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button className="btn btn-primary" asChild>
+            <Link href="/payments/new">Add Payment</Link>
+          </Button>
+          <Button className="btn btn-secondary">Export</Button>
         </div>
       </div>
       <PaymentTable />
