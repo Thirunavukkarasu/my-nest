@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server';
 export async function POST(req: Request) {
     try {
         const { page = 1, limit = 10, searchCriterias = [], sortCriterias = [] } = await req.json();
-        const queryBuilder = await customPaginate(db, flatsTable, {
+        const queryBuilder = customPaginate(db, 'flatsTable', flatsTable, {
             page,
             limit,
             searchCriterias,
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
         });
 
         // Execute the query when ready
-        const result = await queryBuilder.execute('flatsTable');
+        const result = await queryBuilder.execute();
 
         return NextResponse.json(result, { status: 200 });
     } catch (error: any) {

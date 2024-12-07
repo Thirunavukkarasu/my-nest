@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     try {
         const { page = 1, limit = 10, searchCriterias = [], sortCriterias = [] } = await req.json();
 
-        const queryBuilder = customPaginate(db, paymentsTable, {
+        const queryBuilder = customPaginate(db, 'paymentsTable', paymentsTable, {
             page,
             limit,
             searchCriterias,
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
                 resident: true
             }
         });
-        const result = await queryBuilder.execute('paymentsTable');
+        const result = await queryBuilder.execute();
 
         return NextResponse.json(result, { status: 200 });
     } catch (error: any) {

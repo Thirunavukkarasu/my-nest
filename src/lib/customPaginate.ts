@@ -1,108 +1,12 @@
-import { SQL, SQLWrapper, and, asc, desc, eq, gte, ilike, lte, or, sql } from 'drizzle-orm';
-import { PgTableWithColumns } from 'drizzle-orm/pg-core';
-
-interface SearchCriteria {
-    columnName: string;
-    columnOperator: string;
-    columnValue: string | number;
-    isOrCondition?: boolean;
-}
-
-interface SortCriteria {
-    columnName: string;
-    columnOrder?: 'asc' | 'desc';
-}
-
-interface PaginateOptions {
-    page?: number;
-    limit?: number;
-    searchCriterias?: SearchCriteria[];
-    sortCriterias?: SortCriteria[];
-    select?: string[];
-    with?: Record<string, boolean | Record<string, any>>;
-}
-
-interface PaginationResult<T> {
-    docs: T[];
-    pagination: {
-        total: number;
-        page: number;
-        limit: number;
-        totalPages: number;
-    };
-}
-
-interface QueryBuilder<T> {
-    query: any;
-    countQuery: any;
-    execute: (table: any) => Promise<PaginationResult<T>>;
-}
-
-
-const applySearchCriterias = (table: PgTableWithColumns<any>, searchCriterias: SearchCriteria[]): SQLWrapper[] => {
-    return searchCriterias.map(({ columnName, columnOperator, columnValue }) => {
-        if (!table[columnName]) {
-            throw new Error(`Invalid column name: ${columnName}`);
-        }
-
-        let condition: SQL;
-        switch (columnOperator.toLowerCase()) {
-            case 'contains':
-                condition = ilike(table[columnName], `%${columnValue}%`);
-                break;
-            case 'equals':
-                condition = eq(table[columnName], columnValue);
-                break;
-            case 'startswith':
-                condition = ilike(table[columnName], `${columnValue}%`);
-                break;
-            case 'endswith':
-                condition = ilike(table[columnName], `%${columnValue}`);
-                break;
-            case 'gte':
-                condition = gte(table[columnName], columnValue);
-                break;
-            case 'lte':
-                condition = lte(table[columnName], columnValue);
-                break;
-            default:
-                throw new Error(`Unsupported operator: ${columnOperator}`);
-        }
-        return condition;
-    });
-};
-
-const applySorting = (table: PgTableWithColumns<any>, sortCriterias: SortCriteria[]): SQLWrapper[] => {
-    return sortCriterias.map(({ columnName, columnOrder }) => {
-        if (!table[columnName]) {
-            throw new Error(`Invalid column name: ${columnName}`);
-        }
-
-        return columnOrder === 'desc'
-            ? desc(table[columnName])
-            : asc(table[columnName]);
-    });
-};
-
-// Helper Functions
-const applyPagination = (page: number, limit: number) => {
-    const pageNumber = parseInt(page.toString(), 10);
-    const pageSize = parseInt(limit.toString(), 10);
-    const offset = (pageNumber - 1) * pageSize;
-
-    return { pageSize, offset };
-};
-
-const applySelect = (select: string[], table: PgTableWithColumns<any>) => {
-    return select && select.length > 0
-        ? select.map(col => table[col])
-        : undefined;
-};
+import { PgTableWithColumns } from "drizzle-orm/pg-core";
+import { applyPagination, applySearchCriterias, applySelect, applySorting, PaginateOptions, QueryBuilder } from "./commonGrid";
+import { and, or, sql } from "drizzle-orm";
 
 // Main Paginate Function
 const customPaginate = <T>(
     db: any,
-    table: PgTableWithColumns<any>,
+    tableName: string,
+    table: any,
     options: PaginateOptions = {}
 ): QueryBuilder<T> => {
     const {
@@ -141,6 +45,14 @@ const customPaginate = <T>(
     // Create count query
     const countQuery = db.select({ count: sql`count(*)` }).from(table);
 
+    if (whereConditions.length > 0) {
+        countQuery.where(
+            searchCriterias.some(sc => sc.isOrCondition)
+                ? or(...whereConditions)
+                : and(...whereConditions)
+        );
+    }
+
     // Apply pagination
     query = query.limit(pageSize).offset(offset);
 
@@ -148,24 +60,25 @@ const customPaginate = <T>(
     return {
         query,
         countQuery,
-        execute: async (table) => {
-            let docs;
+        execute: async () => {
+            let finalQuery: any;
             if (relations) {
-                const relationalQuery = db.query[table].findMany({
+                finalQuery = db.query[tableName].findMany({
                     limit: pageSize,
                     offset: offset,
                     with: relations,
+                    where: searchCriterias.some(sc => sc.isOrCondition)
+                        ? or(...whereConditions)
+                        : and(...whereConditions),
+                    orderBy: orderByConditions.length > 0 ? orderByConditions : undefined,
                 });
 
-                docs = await relationalQuery.execute((qb: any) => {
-                    qb.where(query.getWhereCondition());
-                    qb.orderBy(query.getOrderByCondition());
-                });
             } else {
-                docs = await query;
+                finalQuery = query;
             }
 
-            const total = Number(countQuery.count);
+            const [docs, countResult] = await Promise.all([finalQuery, countQuery]);
+            const total = Number(countResult[0]?.count || 0);
             const totalPages = Math.ceil(total / pageSize);
 
             return {
@@ -181,4 +94,4 @@ const customPaginate = <T>(
     };
 };
 
-export { customPaginate, applyPagination, applySearchCriterias, applySorting, applySelect };
+export { customPaginate };

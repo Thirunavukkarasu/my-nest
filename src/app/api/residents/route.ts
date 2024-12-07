@@ -1,12 +1,13 @@
 import { db } from '@/db';
-import { customPaginate } from '@/lib/customPaginateV3';
+import { residentsTable } from '@/db/schema';
+import { customPaginate } from '@/lib/customPaginate';
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
     try {
         const { page = 1, limit = 10, searchCriterias = [], sortCriterias = [] } = await req.json();
 
-        const queryBuilder = customPaginate(db, 'residentsTable', {
+        const queryBuilder = customPaginate(db, 'residentsTable', residentsTable, {
             page,
             limit,
             searchCriterias,
