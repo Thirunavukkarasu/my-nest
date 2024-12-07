@@ -1,4 +1,3 @@
-import { relations } from '@/db/schema';
 import { SQL, SQLWrapper, and, asc, desc, eq, gte, ilike, lte, or, sql } from 'drizzle-orm';
 import { PgTableWithColumns } from 'drizzle-orm/pg-core';
 
@@ -29,6 +28,7 @@ interface PaginateOptions {
     select?: string[];
     joins?: JoinOptions[];
     populate?: '*' | string[];
+    tableName?: string;
 }
 
 interface PaginationResult<T> {
@@ -41,11 +41,17 @@ interface PaginationResult<T> {
     };
 }
 
-const customPaginate = async <T>(
+interface QueryBuilder<T> {
+    query: any;
+    countQuery: any;
+    execute: () => Promise<PaginationResult<T>>;
+}
+
+const customPaginate = <T>(
     db: any,
     table: PgTableWithColumns<any>,
     options: PaginateOptions = {}
-): Promise<PaginationResult<T>> => {
+): QueryBuilder<T> => {
     const {
         page = 1,
         limit = 10,
@@ -63,12 +69,6 @@ const customPaginate = async <T>(
 
     // Build the base query
     let query: any = db.select();
-
-    const autoJoins: JoinOptions[] = [];
-    // if (populate === '*' || (Array.isArray(populate) && populate.length > 0)) {
-    //     const tableRelations = relations[table.tableName];
-    //     console.log('relations', tableRelations, table.tableName);
-    // }
 
     query = query.from(table);
 
@@ -134,31 +134,35 @@ const customPaginate = async <T>(
         );
     }
 
-    // Clone query for total count before applying pagination
+    // Create count query
     const countQuery = db.select({ count: sql`count(*)` }).from(table);
 
     // Apply pagination
     query = query.limit(pageSize).offset(offset);
 
-    // Execute both queries
-    const [docs, [countResult]] = await Promise.all([
-        query,
-        countQuery
-    ]);
-
-    // Calculate metadata
-    const total = Number(countResult.count);
-    const totalPages = Math.ceil(total / pageSize);
-
-    // Return data and pagination metadata
+    // Return the query builder object
     return {
-        docs,
-        pagination: {
-            total,
-            page: pageNumber,
-            limit: pageSize,
-            totalPages,
-        },
+        query,
+        countQuery,
+        execute: async () => {
+            const [docs, [countResult]] = await Promise.all([
+                query,
+                countQuery
+            ]);
+
+            const total = Number(countResult.count);
+            const totalPages = Math.ceil(total / pageSize);
+
+            return {
+                docs,
+                pagination: {
+                    total,
+                    page: pageNumber,
+                    limit: pageSize,
+                    totalPages,
+                },
+            };
+        }
     };
 };
 
