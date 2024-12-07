@@ -10,7 +10,6 @@ const executeQuery = async <T>(
 ) => {
     const { whereConditions, orderByConditions, selectColumns, limit, offset } = queryOptions;
 
-    console.log('tableName: ', tableName, 'whereConditions: ', whereConditions, 'orderByConditions: ', orderByConditions, 'selectColumns: ', selectColumns, 'limit: ', limit, 'offset: ', offset, 'relations: ', relations);
     const query = db.query[tableName].findMany({
         where: whereConditions.length > 0 ? whereConditions : undefined,
         orderBy: orderByConditions.length > 0 ? orderByConditions : undefined,

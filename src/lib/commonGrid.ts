@@ -43,30 +43,31 @@ const applySearchCriterias = (table: any, searchCriterias: SearchCriteria[]): SQ
         if (!table[columnName]) {
             throw new Error(`Invalid column name: ${columnName}`);
         }
+        const columnRef = table[columnName];
         let condition: SQL;
         switch (columnOperator.toLowerCase()) {
             case 'contains':
-                condition = ilike(table[columnName], `%${columnValue}%`);
+                condition = ilike(columnRef, `%${columnValue}%`);
                 break;
             case 'equals':
-                condition = eq(table[columnName], columnValue);
+                condition = eq(columnRef, columnValue);
                 break;
             case 'startswith':
-                condition = ilike(table[columnName], `${columnValue}%`);
+                condition = ilike(columnRef, `${columnValue}%`);
                 break;
             case 'endswith':
-                condition = ilike(table[columnName], `%${columnValue}`);
+                condition = ilike(columnRef, `%${columnValue}`);
                 break;
             case 'gte':
-                condition = gte(table[columnName], columnValue);
+                condition = gte(columnRef, columnValue);
                 break;
             case 'lte':
-                condition = lte(table[columnName], columnValue);
+                condition = lte(columnRef, columnValue);
                 break;
             default:
                 throw new Error(`Unsupported operator: ${columnOperator}`);
         }
-        console.log('condition', condition);
+
         return condition;
     });
 };

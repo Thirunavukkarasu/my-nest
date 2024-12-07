@@ -33,8 +33,6 @@ export default function NewFlatForm() {
     async function onSubmit(data: FlatSchema) {
         setIsLoading(true)
         try {
-            // Here you would typically send the data to your API
-            console.log(data)
             await createFlat(data)
             toast({
                 title: "Flat created successfully",

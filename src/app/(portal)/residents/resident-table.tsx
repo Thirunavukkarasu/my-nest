@@ -16,9 +16,26 @@ import Link from "next/link";
 
 export const columns: GridColumnDef<any>[] = [
   {
+    accessorKey: "residentId",
+    header: "Resident ID",
+    dataType: "string",
+  },
+  {
+    accessorKey: "firstName",
+    header: "Resident",
+    size: 200,
+    cell: ({ row }) => {
+      const resident: any = row.original;
+      const fullName = `${resident?.firstName} ${resident?.lastName}`;
+      return (
+        <Link className="underline" href={`/residents/${resident.residentId}`}>{fullName}</Link>
+      )
+    },
+  },
+  {
     accessorKey: "firstName",
     header: "First Name",
-    dataType: "string",
+    dataType: "string"
   },
   {
     accessorKey: "lastName",
@@ -28,12 +45,11 @@ export const columns: GridColumnDef<any>[] = [
   {
     accessorKey: "flat.flatId",
     header: "Flat",
-    dataType: "string",
+    // dataType: "string",
     cell: ({ row }) => {
-      console.log(row);
       const flat = row.original.flat || {};
       return (
-        <Link className="underline" href={`/flats/${flat.flatId}`}>{flat?.flatId}</Link>
+        <Link className="underline" href={`/flats/${flat.flatId}`}>{flat?.flatNumber}</Link>
       )
     },
   },

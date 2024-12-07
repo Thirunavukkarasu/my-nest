@@ -23,24 +23,25 @@ export const columns: ColumnDef<any>[] = [
     cell: dateTimeFormatter,
   },
   {
-    accessorKey: "due_date",
-    header: "Due Date",
+    accessorKey: "paymentId",
+    header: "Payment ID",
+    size: 200,
     cell: ({ row }) => {
-      const dueDate: any = row.getValue("due_date");
-      return dueDate ? (
-        <div>{new Date(dueDate).toLocaleDateString()}</div>
-      ) : (
-        <div>-</div>
-      );
-    },
+      const paymentId: string = row.getValue("paymentId");
+      return (
+        <Link className="underline" href={`/payments/${paymentId}`}>{paymentId}</Link>
+      )
+    }
   },
   {
     accessorKey: "resident",
     header: "Resident",
+    size: 200,
     cell: ({ row }) => {
       const resident: any = row.getValue("resident") || {};
+      const fullName = `${resident?.firstName} ${resident?.lastName}`;
       return (
-        <Link className="underline" href={`/residents/${resident.residentId}`}>{resident?.residentId}</Link>
+        <Link className="underline" href={`/residents/${resident.residentId}`}>{fullName}</Link>
       )
     },
   },
@@ -50,7 +51,7 @@ export const columns: ColumnDef<any>[] = [
     cell: ({ row }) => {
       const flat: any = row.getValue("flat") || {};
       return (
-        <Link className="underline" href={`/flats/${flat.flatId}`}>{flat?.flatId}</Link>
+        <Link className="underline" href={`/flats/${flat.flatId}`}>{flat?.flatNumber}</Link>
       )
     },
   },
@@ -58,7 +59,7 @@ export const columns: ColumnDef<any>[] = [
     accessorKey: "payment_type",
     header: "Payment Type",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("payment_type")}</div>
+      <div className="capitalize">{row.getValue("payment_type") || 'netbanking'}</div>
     ),
   },
   {
@@ -85,6 +86,18 @@ export const columns: ColumnDef<any>[] = [
   {
     accessorKey: "payment_method",
     header: "Payment Method",
+  },
+  {
+    accessorKey: "due_date",
+    header: "Due Date",
+    cell: ({ row }) => {
+      const dueDate: any = row.getValue("due_date");
+      return dueDate ? (
+        <div>{new Date(dueDate).toLocaleDateString()}</div>
+      ) : (
+        <div>-</div>
+      );
+    },
   },
   {
     accessorKey: "reference_number",
