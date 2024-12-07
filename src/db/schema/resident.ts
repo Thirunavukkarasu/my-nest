@@ -22,5 +22,6 @@ export const residentsRelations = relations(residentsTable, ({ one }) => ({
     flat: one(flatsTable, { fields: [residentsTable.flatId], references: [flatsTable.flatId] }),
 }));
 
+
 export const residentSchema = createInsertSchema(residentsTable);
 export type ResidentSchema = z.infer<typeof residentSchema>;

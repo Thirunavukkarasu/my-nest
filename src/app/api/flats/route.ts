@@ -1,26 +1,24 @@
 import { db } from '@/db';
-import { flatsTable, residentsTable } from '@/db/schema';
+import { flatsTable } from '@/db/schema';
 import { customPaginate } from '@/lib/customPaginate';
-import { group } from 'console';
-import { eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
     try {
         const { page = 1, limit = 10, searchCriterias = [], sortCriterias = [] } = await req.json();
-        const queryBuilder = customPaginate(db, flatsTable, {
+        const queryBuilder = await customPaginate(db, flatsTable, {
             page,
             limit,
             searchCriterias,
             sortCriterias,
+            with: {
+                residents: true,
+                payments: true
+            }
         });
 
-        // Add joins or other operations
-        queryBuilder.query = queryBuilder.query.leftJoin(residentsTable, eq(flatsTable.flatId, residentsTable.flatId));
-        queryBuilder.query = queryBuilder.query.groupBy(flatsTable.flatId);
-
         // Execute the query when ready
-        const result = await queryBuilder.execute();
+        const result = await queryBuilder.execute('flatsTable');
 
         return NextResponse.json(result, { status: 200 });
     } catch (error: any) {

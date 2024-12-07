@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { IndiGrid } from "@/components/indi-grid";
 import { dateTimeFormatter } from "@/components/indi-grid/grid-formatters";
+import Link from "next/link";
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -31,6 +32,26 @@ export const columns: ColumnDef<any>[] = [
       ) : (
         <div>-</div>
       );
+    },
+  },
+  {
+    accessorKey: "resident",
+    header: "Resident",
+    cell: ({ row }) => {
+      const resident: any = row.getValue("resident") || {};
+      return (
+        <Link className="underline" href={`/residents/${resident.residentId}`}>{resident?.residentId}</Link>
+      )
+    },
+  },
+  {
+    accessorKey: "flat",
+    header: "Flat",
+    cell: ({ row }) => {
+      const flat: any = row.getValue("flat") || {};
+      return (
+        <Link className="underline" href={`/flats/${flat.flatId}`}>{flat?.flatId}</Link>
+      )
     },
   },
   {
