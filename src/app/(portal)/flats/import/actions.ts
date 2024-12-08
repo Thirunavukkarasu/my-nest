@@ -1,6 +1,9 @@
 'use server'
 
 import { parse } from 'csv-parse/sync'
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+
 import { db } from "@/db"
 import { flatsTable } from "@/db/schema"
 
@@ -22,6 +25,12 @@ export async function importFlats(formData: FormData) {
     });
 
     await db.insert(flatsTable).values(finalRecords)
+
+    // Revalidate the current page
+    revalidatePath('/flats') // Replace with the appropriate path
+
+    // Optionally redirect to another page
+    redirect('/flats') // Replace with the appropriate path
 
     return { importedCount: records.length }
 }

@@ -6,7 +6,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-export function ImportForm({ formAction }: any) {
+type ImportFormProps = {
+    formAction: (formData: FormData) => Promise<{ importedCount: number }>
+    entityName: string
+}
+
+export function ImportForm({ formAction, entityName }: ImportFormProps) {
     const [file, setFile] = useState<File | null>(null)
     const [importing, setImporting] = useState(false)
     const [result, setResult] = useState<string | null>(null)
@@ -43,6 +48,15 @@ export function ImportForm({ formAction }: any) {
                     onChange={(e) => setFile(e.target.files?.[0] || null)}
                     disabled={importing}
                 />
+            </div>
+            <div>
+                <a
+                    href={`/data/${entityName}.csv`}
+                    download
+                    className="text-blue-500 underline text-sm"
+                >
+                    Download Sample CSV
+                </a>
             </div>
             <Button type="submit" disabled={!file || importing}>
                 {importing ? 'Importing...' : 'Import Data'}
