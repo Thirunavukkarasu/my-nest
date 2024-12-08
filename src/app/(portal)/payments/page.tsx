@@ -16,7 +16,11 @@ export default async function Payments() {
           <Button className="btn btn-primary" asChild>
             <Link href="/payments/new">Add Payment</Link>
           </Button>
-          <Button className="btn btn-secondary">Export</Button>
+          <Button className="btn btn-secondary" asChild>
+            <Link href="/payments/import">
+              Import
+            </Link>
+          </Button>
         </div>
       </div>
       <PaymentTable />

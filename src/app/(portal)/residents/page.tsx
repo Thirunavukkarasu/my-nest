@@ -16,7 +16,11 @@ export default async function Residents() {
           <Button className="btn btn-primary" asChild>
             <Link href="/residents/new">Add Resident</Link>
           </Button>
-          <Button className="btn btn-secondary">Export</Button>
+          <Button className="btn btn-secondary" asChild>
+            <Link href="/residents/import">
+              Import
+            </Link>
+          </Button>
         </div>
       </div>
       <ResidentTable />

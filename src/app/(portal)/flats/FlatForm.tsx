@@ -10,14 +10,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { toast } from "@/hooks/use-toast"
 import { flatSchema, type FlatSchema } from "@/db/schema/flat"
-import { createFlat } from "../actions"
+import { createFlat, updateFlat } from "./actions"
 
-export default function NewFlatForm() {
-    const [isLoading, setIsLoading] = useState<boolean>(false)
+type FlatFormProps = {
+    initialData?: FlatSchema
+    isEditMode: boolean
+}
+
+export default function FlatForm({ initialData, isEditMode }: FlatFormProps) {
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const form = useForm<FlatSchema>({
         resolver: zodResolver(flatSchema),
-        defaultValues: {
+        defaultValues: initialData || {
             flatNumber: "",
             floorNumber: 1,
             bedrooms: 1,
@@ -31,12 +36,17 @@ export default function NewFlatForm() {
     })
 
     async function onSubmit(data: FlatSchema) {
-        setIsLoading(true)
+        setIsSubmitting(true)
         try {
-            await createFlat(data)
+
+            if (isEditMode) {
+                await updateFlat(data)
+            } else {
+                await createFlat(data)
+            }
             toast({
-                title: "Flat created successfully",
-                description: `Flat ${data.flatNumber} has been added.`,
+                title: `Flat ${isEditMode ? 'Updated' : 'Added'}`,
+                description: `Flat ${data.flatNumber} has been ${isEditMode ? 'updated' : 'added'} successfully.`,
             })
             form.reset()
         } catch (error) {
@@ -46,7 +56,7 @@ export default function NewFlatForm() {
                 variant: "destructive",
             })
         } finally {
-            setIsLoading(false)
+            setIsSubmitting(false)
         }
     }
 
@@ -191,8 +201,8 @@ export default function NewFlatForm() {
                         </FormItem>
                     )}
                 />
-                <Button type="submit" disabled={isLoading}>
-                    {isLoading ? "Creating..." : "Create Flat"}
+                <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? 'Submitting...' : isEditMode ? 'Update Flat' : 'Add Flat'}
                 </Button>
             </form>
         </Form>

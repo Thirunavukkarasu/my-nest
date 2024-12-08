@@ -2,6 +2,7 @@
 
 import { db } from '@/db'
 import { FlatSchema, flatsTable } from '@/db/schema/flat'
+import { eq } from 'drizzle-orm'
 
 export async function createFlat(data: FlatSchema) {
     try {
@@ -14,3 +15,12 @@ export async function createFlat(data: FlatSchema) {
     }
 }
 
+export async function updateFlat(data: FlatSchema) {
+    if (!data.flatId) {
+        throw new Error('flatId is required to update a flat')
+    }
+
+    await db.update(flatsTable)
+        .set(data)
+        .where(eq(flatsTable.flatId, data.flatId))
+}
