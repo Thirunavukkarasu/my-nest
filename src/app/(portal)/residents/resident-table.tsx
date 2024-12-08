@@ -18,7 +18,7 @@ export const columns: GridColumnDef<any>[] = [
   {
     accessorKey: "residentId",
     header: "Resident ID",
-    dataType: "string",
+    // dataType: "string",
   },
   {
     accessorKey: "firstName",
