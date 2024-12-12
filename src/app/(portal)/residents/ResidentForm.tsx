@@ -8,15 +8,21 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Checkbox } from '@/components/ui/checkbox'
-import { createResident } from '../actions'
-// import { createResident } from '@/app/actions/residents'
+import { createResident, updateResident } from './actions'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-export default function NewResidentForm() {
+type ResidentFormProps = {
+  initialData?: ResidentSchema
+  isEditMode: boolean
+  flats: any[]
+}
+
+export default function ResidentForm({ initialData, isEditMode, flats }: ResidentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<ResidentSchema>({
     resolver: zodResolver(residentSchema),
-    defaultValues: {
+    defaultValues: initialData || {
       firstName: '',
       lastName: '',
       email: '',
@@ -29,11 +35,14 @@ export default function NewResidentForm() {
   async function onSubmit(data: ResidentSchema) {
     setIsSubmitting(true)
     try {
-      await createResident(data)
-      form.reset()
+      if (isEditMode) {
+        await updateResident(data)
+      } else {
+        await createResident(data)
+      }
       // You might want to add a success message or redirect here
     } catch (error) {
-      console.error('Failed to create resident:', error)
+      console.error('Failed to submit resident:', error)
       // You might want to show an error message to the user here
     } finally {
       setIsSubmitting(false)
@@ -100,10 +109,21 @@ export default function NewResidentForm() {
           name="flatId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Flat ID</FormLabel>
-              <FormControl>
-                <Input type="number" {...field} onChange={(e) => field.onChange(parseInt(e.target.value, 10))} />
-              </FormControl>
+              <FormLabel>Flat</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a flat" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {flats.map((flat) => (
+                    <SelectItem key={flat.flatId} value={flat.flatId.toString()}>
+                      {flat.flatNumber}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -142,7 +162,7 @@ export default function NewResidentForm() {
             <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
                 <Checkbox
-                  checked={!!field.value}
+                  checked={field.value ?? false}
                   onCheckedChange={field.onChange}
                 />
               </FormControl>
@@ -158,7 +178,7 @@ export default function NewResidentForm() {
           )}
         />
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Submitting...' : 'Add Resident'}
+          {isSubmitting ? 'Submitting...' : isEditMode ? 'Update Resident' : 'Add Resident'}
         </Button>
       </form>
     </Form>

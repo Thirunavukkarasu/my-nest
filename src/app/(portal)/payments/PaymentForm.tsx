@@ -15,14 +15,14 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { createPayment } from '../actions';
+import { createPayment } from './actions';
 
 interface NewPaymentFormProps {
     flats: { flatId: number; flatNumber: string }[];
     residents: { residentId: number; firstName: string; lastName: string }[];
 }
 
-export default function NewPaymentForm({ flats, residents }: NewPaymentFormProps) {
+export default function PaymentForm({ flats, residents }: NewPaymentFormProps) {
     const form = useForm<PaymentSchema>({
         resolver: zodResolver(paymentSchema),
         defaultValues: {
