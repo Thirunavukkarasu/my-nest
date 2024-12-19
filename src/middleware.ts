@@ -1,5 +1,5 @@
-import { withAuth } from "next-auth/middleware"
-import { NextResponse } from "next/server"
+import { withAuth } from 'next-auth/middleware'
+import { NextResponse } from 'next/server'
 
 export default withAuth(
   function middleware(req) {
@@ -19,9 +19,7 @@ export default withAuth(
       if (req.nextUrl.search) {
         from += req.nextUrl.search
       }
-      return NextResponse.redirect(
-        new URL(`/signin?from=${encodeURIComponent(from)}`, req.url)
-      )
+      return NextResponse.redirect(new URL(`/signin?from=${encodeURIComponent(from)}`, req.url))
     }
   },
   {
@@ -29,7 +27,7 @@ export default withAuth(
       authorized: ({ req, token }) => {
         // This function is called for every request
         // Return true if the request should be allowed, false otherwise
-        if (req.nextUrl.pathname.startsWith("/admin") && token?.role !== "admin") {
+        if (req.nextUrl.pathname.startsWith('/admin') && token?.role !== 'admin') {
           return false
         }
         return true
@@ -38,14 +36,6 @@ export default withAuth(
   }
 )
 
-
 export const config = {
-  matcher: [
-    '/dashboard',
-    '/payments',
-    '/flats',
-    '/tenants',
-    '/owners'
-  ],
+  matcher: ['/dashboard', '/payments', '/flats', '/tenants', '/owners', '/expenses'],
 }
-
