@@ -21,7 +21,7 @@ const mock = async () => {
   return data
 }
 
-const data:ResidentSchema[]= [
+const data:any[]= [
   {
       "flatId": "G001",
       "firstName": "ARUN ",
