@@ -10,7 +10,7 @@ const mock = async () => {
     const randomDate = faker.date.recent({ days: 30 })
 
     data.push({
-      expenseDate: randomDate, // Random date in the last 30 days
+      expenseDate: randomDate.toISOString(), // Random date in the last 30 days
       category: faker.helpers.arrayElement(['Security', 'Food', 'Office Supplies', 'Utilities', 'Other']),
       description: faker.lorem.words(),
       amount: faker.finance.amount({ min: 100, max: 1000, dec: 2 }), // Random amount between 100 and 1000
