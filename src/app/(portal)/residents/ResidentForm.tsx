@@ -33,6 +33,7 @@ export default function ResidentForm({ initialData, isEditMode, flats }: Residen
   })
 
   async function onSubmit(data: ResidentSchema) {
+    console.log('Submitting resident:', data)
     setIsSubmitting(true)
     try {
       if (isEditMode) {
@@ -110,7 +111,7 @@ export default function ResidentForm({ initialData, isEditMode, flats }: Residen
           render={({ field }) => (
             <FormItem>
               <FormLabel>Flat</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+              <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={field.value?.toString()}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a flat" />

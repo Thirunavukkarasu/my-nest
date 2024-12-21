@@ -22,6 +22,13 @@
       "when": 1733586619854,
       "tag": "0002_smiling_spitfire",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1734722283237,
+      "tag": "0003_fine_iron_man",
+      "breakpoints": true
     }
   ]
 }

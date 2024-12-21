@@ -4,7 +4,7 @@ content-type: application/json
 {
     "name": "Test",
     "email": "test@gmail.com",
-    "password": ""
+    "password": "changeme"
 }
 
 ### Get all flats
