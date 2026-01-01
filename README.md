@@ -1,14 +1,19 @@
 # My Nest
 
-A monorepo application for managing apartments and tenants in a building.
+A simple code colocation project for managing apartments and tenants in a building.
 
 ## Project Structure
 
-This is a monorepo containing:
+This project uses a simple folder-based structure:
 
-- **`apps/web`** - Next.js web application (Admin interface + API backend)
-- **`apps/mobile`** - Expo mobile application (Resident interface)
-- **`packages/shared`** - Shared types, utilities, and constants
+```
+my-nest/
+├── web/          # Next.js web application (Admin interface + API backend)
+├── mobile/       # Expo mobile application (Resident interface)
+├── api/          # Express API server (deployed separately on Vercel)
+├── docs/         # Documentation
+└── scripts/      # Utility scripts
+```
 
 ## Features
 
@@ -18,51 +23,20 @@ This is a monorepo containing:
 - List all residents
 - Manage Payments
 - Manage Maintenance Requests
-- Manage Complaints
-- Manage Notices
 
-## Technologies
+## Getting Started
 
-- **Web App**: Next.js, React, Tailwind CSS, DrizzleORM, NextAuth
-- **Mobile App**: Expo, React Native, NativeWind
-- **Database**: PostgreSQL (Neon)
-
-## Installation
-
-1. Clone the repository
+### Web App (Admin)
 
 ```bash
-git clone git@github.com:Thirunavukkarasu/my-nest.git
-cd my-nest
-```
+# Navigate to web directory
+cd web
 
-2. Install pnpm (if not already installed)
-
-```bash
-npm install -g pnpm
-# or
-brew install pnpm
-```
-
-3. Install dependencies
-
-```bash
+# Install dependencies
 pnpm install
-```
 
-**Note**: This project uses pnpm for better monorepo dependency management. See [pnpm Migration Guide](./docs/mobile/PNPM_MIGRATION.md) for details.
-
-## Development
-
-### Web App (Admin + API)
-
-```bash
 # Start development server
-npm run dev:web
-
-# Or navigate to the web app directory
-cd apps/web
-npm run dev
+pnpm dev
 ```
 
 The web app will be available at `http://localhost:3000`
@@ -70,51 +44,34 @@ The web app will be available at `http://localhost:3000`
 ### Mobile App (Residents)
 
 ```bash
+# Navigate to mobile directory
+cd mobile
+
+# Install dependencies
+pnpm install
+
 # Start Expo development server
-npm run dev:mobile
-
-# Or navigate to the mobile app directory
-cd apps/mobile
-npm start
+pnpm start
 ```
 
-### Database Commands
+### API Server
 
 ```bash
-# Generate migrations
-npm run db:generate
+# Navigate to api directory
+cd api
 
-# Run migrations
-npm run db:migrate
+# Install dependencies
+pnpm install
 
-# Seed database
-npm run db:seed
+# Start development server
+pnpm dev
 ```
-
-### Building Android APK
-
-```bash
-# Setup Android SDK (first time only)
-npm run setup:android
-
-# Build production APK on cloud
-npm run build:apk
-
-# Build preview APK on cloud
-npm run build:apk:preview
-
-# Build production APK locally
-npm run build:apk:local
-
-# Or use the script directly
-./scripts/build-android-apk.sh --help
-```
-
-See [Scripts Documentation](./scripts/README.md) for more details.
 
 ## Environment Variables
 
-Create a `.env.local` file in `apps/web` directory and add:
+### Web App
+
+Create a `.env.local` file in `web` directory:
 
 ```bash
 POSTGRES_URL=your_postgres_url
@@ -122,33 +79,55 @@ NEXTAUTH_SECRET=your_nextauth_secret
 NEXTAUTH_URL=http://localhost:3000
 ```
 
-For the mobile app, create a `.env` file in `apps/mobile` directory:
+### Mobile App
+
+Create a `.env` file in `mobile` directory:
 
 ```bash
-API_URL=http://localhost:3000/api
+EXPO_PUBLIC_API_URL=http://localhost:3000/api
+```
+
+## Database Commands
+
+From the `web` directory:
+
+```bash
+# Generate migrations
+pnpm db:generate
+
+# Run migrations
+pnpm db:migrate
+
+# Seed database
+pnpm db:seed
+```
+
+## Building Android APK
+
+From the `mobile` directory:
+
+```bash
+# Build production APK on cloud
+pnpm build:android:production
+
+# Build preview APK on cloud
+pnpm build:android:preview
+
+# Build locally (requires Android SDK)
+pnpm build:android:production:local
 ```
 
 ## Architecture
 
-- **Web App (`apps/web`)**: Serves as both the admin dashboard and the API backend
-- **Mobile App (`apps/mobile`)**: Consumes the API from the web app for resident-facing features
-- **Shared Package (`packages/shared`)**: Contains shared types and utilities used by both apps
+- **Web App (`web`)**: Serves as both the admin dashboard and the API backend
+- **Mobile App (`mobile`)**: Consumes the API from the web app for resident-facing features
+- **API (`api`)**: Express API server deployed separately on Vercel
 
 ## Documentation
 
-All project documentation is available in the [`docs/`](./docs/) folder:
+See the [docs](./docs/) directory for detailed documentation:
 
-- [Architecture](./docs/architecture/STRUCTURE.md) - Project structure and organization
-- [CI/CD](./docs/ci-cd/) - Build and deployment workflows
-- [Mobile App](./docs/mobile/) - Mobile app setup and build guides
-
-## API Endpoints
-
-The web app exposes API endpoints at `/api/*`:
-
-- `/api/auth/*` - Authentication endpoints
-- `/api/flats` - Flat management
-- `/api/residents` - Resident management
-- `/api/payments` - Payment management
-- `/api/expenses` - Expense management
-- `/api/transaction-history` - Transaction history
+- [API Documentation](./docs/api/)
+- [Architecture](./docs/architecture/)
+- [Mobile Development](./docs/mobile/)
+- [CI/CD](./docs/ci-cd/)

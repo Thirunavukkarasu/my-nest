@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 # Script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-MOBILE_DIR="$PROJECT_ROOT/apps/mobile"
+MOBILE_DIR="$PROJECT_ROOT/mobile"
 
 # Default values
 BUILD_TYPE="production"
@@ -91,7 +91,7 @@ if [ ! -f "eas.json" ]; then
   echo -e "${RED}✗ Error: eas.json not found${NC}"
   echo ""
   echo "Please configure EAS first:"
-  echo "  cd apps/mobile"
+  echo "  cd mobile"
   echo "  npx eas-cli build:configure"
   exit 1
 fi

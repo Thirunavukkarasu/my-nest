@@ -1,0 +1,148 @@
+POST http://localhost:3000/api/register HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Test",
+    "email": "test@gmail.com",
+    "password": "changeme"
+}
+
+### Get all flats
+
+POST http://localhost:3000/api/flats HTTP/1.1
+content-type: application/json
+
+{
+   "page": 1,
+   "limit": 10,
+   "searchCriterias": [
+         {
+              "columnName": "flatNumber",
+              "columnOperator": "contains",
+              "columnValue": "G"
+         }
+   ],
+    "sortCriterias": [{
+        "columnName": "createdAt",
+        "columnOrder": "desc"
+    }]
+}
+
+### Create a flat
+
+POST http://localhost:3000/api/flats/mutate HTTP/1.1
+content-type: application/json
+
+{
+    "floorNumber": 1,
+    "flatNumber": "G003"
+}
+
+### Update a flat
+
+PUT http://localhost:3000/api/flats/mutate HTTP/1.1
+content-type: application/json
+
+{
+    "flatId": 1,
+    "floorNumber": 2,
+    "flatNumber": "G003",
+    "status": "occupied"
+}
+
+### Delete a flat
+
+DELETE http://localhost:3000/api/flats/mutate/1 HTTP/1.1
+
+### Get all Residents
+
+POST http://localhost:3000/api/residents HTTP/1.1
+content-type: application/json
+
+{
+   "page": 1,
+   "limit": 10,
+   "searchCriterias": [
+     
+   ],
+    "sortCriterias": [{
+        "columnName": "createdAt",
+        "columnOrder": "desc"
+    }]
+}
+
+### Create a resident
+
+POST http://localhost:3000/api/residents/mutate HTTP/1.1
+content-type: application/json
+
+{
+    "flatId": 2,
+    "firstName": "Mithlesh",
+    "lastName": "Kumar",
+    "email": "mithlesh.kumar@gmail.com",
+    "leaseStartDate": "2021-09-01"
+}
+
+### Update a resident
+
+PUT http://localhost:3000/api/residents/mutate HTTP/1.1
+content-type: application/json
+
+{
+    "residentId": 1,
+    "firstName": "Mithlesh",
+    "lastName": "Kumar Updated",
+    "email": "mithlesh.kumar.updated@gmail.com",
+    "leaseStartDate": "2021-09-01"
+}
+
+### Delete a resident
+
+DELETE http://localhost:3000/api/residents/mutate/1 HTTP/1.1
+
+### Get all Payments
+
+POST http://localhost:3000/api/payments HTTP/1.1
+content-type: application/json
+
+{
+   "page": 1,
+   "limit": 10,
+   "searchCriterias": [
+     
+   ],
+    "sortCriterias": [{
+        "columnName": "createdAt",
+        "columnOrder": "desc"
+    }]
+}
+
+### Create a payment
+
+POST http://localhost:3000/api/payments/mutate HTTP/1.1
+content-type: application/json
+
+{
+    "flatId": 2,
+    "residentId": 1,
+    "amount": "1000.00",
+    "paymentDate": "2021-09-01",
+    "status": "paid"
+}
+
+### Update a payment
+
+PUT http://localhost:3000/api/payments/mutate HTTP/1.1
+content-type: application/json
+
+{
+    "paymentId": 1,
+    "amount": "1500.00",
+    "status": "paid",
+    "paymentMethod": "UPI"
+}
+
+### Delete a payment
+
+DELETE http://localhost:3000/api/payments/mutate/1 HTTP/1.1

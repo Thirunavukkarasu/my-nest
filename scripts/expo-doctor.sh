@@ -7,7 +7,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-MOBILE_DIR="$PROJECT_ROOT/apps/mobile"
+MOBILE_DIR="$PROJECT_ROOT/mobile"
 
 cd "$MOBILE_DIR"
 

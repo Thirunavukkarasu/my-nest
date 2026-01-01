@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "skipLibCheck": true,
+    "types": ["bun"],
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
+  "exclude": ["node_modules"]
+}

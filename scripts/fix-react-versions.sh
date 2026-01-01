@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-MOBILE_DIR="$PROJECT_ROOT/apps/mobile"
+MOBILE_DIR="$PROJECT_ROOT/mobile"
 
 echo -e "${BLUE}React Version Fix Script${NC}"
 echo "=============================="
@@ -44,7 +44,7 @@ echo ""
 echo -e "${BLUE}Step 4: Verifying React is installed locally...${NC}"
 if [ -f "node_modules/react/package.json" ]; then
   REACT_VERSION=$(node -e "console.log(require('./node_modules/react/package.json').version)")
-  echo -e "${GREEN}✓ React $REACT_VERSION installed in apps/mobile/node_modules${NC}"
+  echo -e "${GREEN}✓ React $REACT_VERSION installed in mobile/node_modules${NC}"
   
   if [ "$REACT_VERSION" != "19.1.0" ]; then
     echo -e "${YELLOW}⚠ React version is $REACT_VERSION, expected 19.1.0${NC}"
