@@ -105,3 +105,14 @@ npm run build:android:production
 
 This will build on Expo's servers and you can download the APK when it's done.
 
+## Troubleshooting
+
+### NDK Missing source.properties
+
+If you see:
+```
+[CXX1101] NDK at ... did not have a source.properties file
+```
+
+See [NDK Fix Guide](./NDK_FIX.md) for solutions.
+

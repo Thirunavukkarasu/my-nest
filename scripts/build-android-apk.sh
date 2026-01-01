@@ -142,11 +142,26 @@ fi
 echo -e "${GREEN}✓ Node.js $(node --version)${NC}"
 echo -e "${GREEN}✓ npm $(npm --version)${NC}"
 
+# Detect package manager
+if command -v pnpm &> /dev/null && [ -f "../../pnpm-lock.yaml" ]; then
+  PACKAGE_MANAGER="pnpm"
+elif command -v yarn &> /dev/null && [ -f "../../yarn.lock" ]; then
+  PACKAGE_MANAGER="yarn"
+else
+  PACKAGE_MANAGER="npm"
+fi
+
 # Install dependencies if needed
 if [ ! -d "node_modules" ]; then
   echo ""
-  echo "Installing dependencies..."
-  npm install
+  echo "Installing dependencies with $PACKAGE_MANAGER..."
+  if [ "$PACKAGE_MANAGER" = "pnpm" ]; then
+    pnpm install
+  elif [ "$PACKAGE_MANAGER" = "yarn" ]; then
+    yarn install
+  else
+    npm install
+  fi
 fi
 
 # Build command

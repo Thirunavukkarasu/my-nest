@@ -2,31 +2,44 @@
   "name": "my-nest",
   "version": "0.1.0",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
-    "dev:web": "npm run dev --workspace=@my-nest/web",
-    "dev:mobile": "npm run start --workspace=@my-nest/mobile",
-    "build:web": "npm run build --workspace=@my-nest/web",
-    "build:mobile": "npm run build --workspace=@my-nest/mobile",
-    "build:android:preview": "npm run build:android:preview --workspace=@my-nest/mobile",
-    "build:android:production": "npm run build:android:production --workspace=@my-nest/mobile",
-    "build:android:preview:local": "npm run build:android:preview:local --workspace=@my-nest/mobile",
-    "build:android:production:local": "npm run build:android:production:local --workspace=@my-nest/mobile",
+    "dev:web": "pnpm --filter @my-nest/web dev",
+    "dev:mobile": "pnpm --filter @my-nest/mobile start",
+    "build:web": "pnpm --filter @my-nest/web build",
+    "build:mobile": "pnpm --filter @my-nest/mobile build",
+    "build:android:preview": "pnpm --filter @my-nest/mobile build:android:preview",
+    "build:android:production": "pnpm --filter @my-nest/mobile build:android:production",
+    "build:android:preview:local": "pnpm --filter @my-nest/mobile build:android:preview:local",
+    "build:android:production:local": "pnpm --filter @my-nest/mobile build:android:production:local",
     "build:apk": "./scripts/build-android-apk.sh",
     "build:apk:preview": "./scripts/build-android-apk.sh --preview",
     "build:apk:local": "./scripts/build-android-apk.sh --local",
     "build:apk:preview:local": "./scripts/build-android-apk.sh --preview --local",
     "setup:android": "./scripts/setup-android-home.sh",
-    "lint:web": "npm run lint --workspace=@my-nest/web",
-    "lint:mobile": "npm run lint --workspace=@my-nest/mobile",
-    "db:generate": "npm run db:generate --workspace=@my-nest/web",
-    "db:migrate": "npm run db:migrate --workspace=@my-nest/web",
-    "db:seed": "npm run db:seed --workspace=@my-nest/web"
+    "fix:react": "./scripts/fix-react-versions.sh",
+    "migrate:pnpm": "./scripts/migrate-to-pnpm.sh",
+    "expo:doctor": "./scripts/expo-doctor.sh",
+    "lint:web": "pnpm --filter @my-nest/web lint",
+    "lint:mobile": "pnpm --filter @my-nest/mobile lint",
+    "db:generate": "pnpm --filter @my-nest/web db:generate",
+    "db:migrate": "pnpm --filter @my-nest/web db:migrate",
+    "db:seed": "pnpm --filter @my-nest/web db:seed"
   },
   "devDependencies": {
     "typescript": "^5"
+  },
+  "overrides": {
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-reanimated": "~4.1.1",
+    "react-native-worklets": "0.5.1",
+    "nativewind": {
+      "react": "19.1.0",
+      "react-dom": "19.1.0",
+      "react-native": "0.81.5",
+      "react-native-reanimated": "~4.1.1",
+      "react-native-worklets": "0.5.1"
+    }
   }
 }

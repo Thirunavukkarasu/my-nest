@@ -10,10 +10,6 @@
 !.yarn/releases
 !.yarn/versions
 
-# pnpm
-# pnpm-lock.yaml - Keep this file! EAS Build needs it to detect pnpm
-.pnpm-store
-
 # testing
 /coverage
 
@@ -42,15 +38,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# expo
-.expo/
-.expo-shared/
-dist/
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
-*.orig.*
-web-build/

@@ -36,11 +36,21 @@ git clone git@github.com:Thirunavukkarasu/my-nest.git
 cd my-nest
 ```
 
-2. Install dependencies
+2. Install pnpm (if not already installed)
 
 ```bash
-npm install
+npm install -g pnpm
+# or
+brew install pnpm
 ```
+
+3. Install dependencies
+
+```bash
+pnpm install
+```
+
+**Note**: This project uses pnpm for better monorepo dependency management. See [pnpm Migration Guide](./docs/mobile/PNPM_MIGRATION.md) for details.
 
 ## Development
 

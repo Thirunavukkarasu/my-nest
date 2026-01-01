@@ -16,27 +16,34 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Set up pnpm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
       # Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18" # Specify your Node.js version
+          node-version: "18"
+          cache: "pnpm"
 
       # Install dependencies
       - name: Install dependencies
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       # Run linting
       #   - name: Lint code
-      #     run: npm run lint
+      #     run: pnpm run lint
 
       #   # Run tests
       #   - name: Run tests
-      #     run: npm test
+      #     run: pnpm test
 
       # Build the Next.js app
       - name: Build Next.js app
-        run: npm run build
+        run: pnpm run build:web
 
     #   # Run Next.js type check (optional)
     #   - name: Run TypeScript type check
