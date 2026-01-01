@@ -282,11 +282,11 @@ export async function seed(db: DB) {
 
     const residentsData = await db.query.residentsTable.findMany();
     const flatsData = await db.query.flatsTable.findMany();
-    const paymentData:any = [];
+    const paymentData: any = [];
 
     for (let flatIdx = 0; flatIdx < paidFlatNumbers.length; flatIdx++) {
         const flatData = flatsData.find(flat => flat.flatNumber === paidFlatNumbers[flatIdx]?.flatNumber);
-        console.log(paidFlatNumbers[flatIdx].flatNumber,flatData);
+        console.log(paidFlatNumbers[flatIdx].flatNumber, flatData);
 
         const residentData = residentsData.find(resident => resident.flatId === flatData?.flatId);
         paymentData.push({
