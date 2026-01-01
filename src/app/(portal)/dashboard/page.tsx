@@ -114,7 +114,7 @@ export default function PaymentHeatmap() {
   }, [flatsData, filterText]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col mx-auto">
       <div className="bg-white shadow-xl rounded-lg overflow-hidden">
         <div className="p-4 border-b border-gray-200 flex justify-between">
           <div className="flex items-center w-2/4">

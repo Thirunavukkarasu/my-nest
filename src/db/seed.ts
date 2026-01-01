@@ -15,22 +15,23 @@ const db = drizzle(pool, { schema });
 type DB = NodePgDatabase<typeof schema>;
 
 async function resetTable(db: DB, table: Table) {
-    return db.execute(sql`truncate table ${table} restart identity cascade`);
+  return db.execute(sql`truncate table ${table} restart identity cascade`)
 }
 
 async function main() {
-    for (const table of [
-        schema.usersTable,
-        schema.flatsTable,
-        schema.residentsTable,
-        schema.paymentsTable,
-        schema.expensesTable
-    ]) {
-        await resetTable(db, table);
-    }
-    await seeds.flat(db);
-    await seeds.resident(db);
-    await seeds.payment(db);
+  for (const table of [
+    schema.usersTable,
+    schema.flatsTable,
+    schema.residentsTable,
+    schema.paymentsTable,
+    schema.expensesTable,
+  ]) {
+    await resetTable(db, table)
+  }
+  await seeds.flat(db)
+  await seeds.resident(db)
+  await seeds.payment(db)
+  await seeds.expense(db)
 }
 
 main()

@@ -11,12 +11,27 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { IndiGrid } from "@/components/indi-grid";
 import { GridColumnDef } from "@/types";
+import Link from "next/link";
 
 export const columns: GridColumnDef<any>[] = [
+  {
+    accessorKey: "flatId",
+    header: "Flat ID",
+    // dataType: "string",
+  },
   {
     accessorKey: "flatNumber",
     header: "Flat No",
     dataType: "string",
+    cell: ({ row }) => {
+      const flatNumber: any = row.getValue("flatNumber");
+      const flatId: any = row.getValue("flatId");
+      return (
+        <Link href={`/flats/${flatId}`} className="underline">
+          {flatNumber}
+        </Link>
+      );
+    }
   },
   {
     accessorKey: "floorNumber",

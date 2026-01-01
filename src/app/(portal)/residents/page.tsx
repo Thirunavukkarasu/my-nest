@@ -1,4 +1,6 @@
+import { Button } from "@/components/ui/button";
 import ResidentTable from "./resident-table";
+import Link from "next/link";
 
 export default async function Residents() {
   return (
@@ -9,6 +11,16 @@ export default async function Residents() {
           <p className="text-muted-foreground">
             View and manage all residents in your society
           </p>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button className="btn btn-primary" asChild>
+            <Link href="/residents/new">Add Resident</Link>
+          </Button>
+          <Button className="btn btn-secondary" asChild>
+            <Link href="/residents/import">
+              Import
+            </Link>
+          </Button>
         </div>
       </div>
       <ResidentTable />

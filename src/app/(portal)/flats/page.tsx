@@ -1,3 +1,6 @@
+import Link from "next/link";
+
+import { Button } from "@/components/ui/button";
 import FlatsTable from "./flat-table";
 
 export default async function Flats() {
@@ -9,6 +12,14 @@ export default async function Flats() {
           <p className="text-muted-foreground">
             View and manage all the flats in your society
           </p>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button className="btn btn-primary" asChild>
+            <Link href="/flats/new">Add Flat</Link>
+          </Button>
+          <Button className="btn btn-secondary" asChild>
+            <Link href="/flats/import">Import</Link>
+          </Button>
         </div>
       </div>
       <FlatsTable />

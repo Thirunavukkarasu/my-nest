@@ -58,6 +58,11 @@ const data = {
       url: "/expenses",
       icon: SquareTerminal,
     },
+    {
+      title: 'Transacion History',
+      url: '/transaction-history',
+      icon: SquareTerminal,
+    }
   ],
 };
 

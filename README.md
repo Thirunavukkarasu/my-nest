@@ -19,6 +19,7 @@ Manage aparments and tenants in a building with this my-nest application.
 - React
 - Vercel
 - Tailwind CSS
+- DrizzleORM
 
 # Installation
 
