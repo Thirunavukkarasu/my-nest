@@ -1,8 +1,18 @@
 import { sql, Table } from "drizzle-orm";
+import { Pool } from "pg";
+import { drizzle, NodePgDatabase } from "drizzle-orm/node-postgres";
 
-import { db, DB } from "@/db";
+import env from "@/lib/env";
 import * as schema from "@/db/schema";
 import * as seeds from "@/db/seeds";
+
+const pool = new Pool({
+    connectionString: env.POSTGRES_URL,
+});
+
+const db = drizzle(pool, { schema });
+
+type DB = NodePgDatabase<typeof schema>;
 
 async function resetTable(db: DB, table: Table) {
     return db.execute(sql`truncate table ${table} restart identity cascade`);
@@ -29,6 +39,7 @@ main()
         process.exit(1);
     })
     .finally(async () => {
+        await pool.end();
         console.log("Seeding done!");
         process.exit(0);
     });

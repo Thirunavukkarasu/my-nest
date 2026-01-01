@@ -1,7 +1,9 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcrypt";
-import { sql } from "@vercel/postgres";
+import { db } from "@/db";
+import { usersTable } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 const handler = NextAuth({
     providers: [
@@ -15,23 +17,22 @@ const handler = NextAuth({
                     return null;
                 }
 
-                const { rows } = await sql`
-                    SELECT * FROM users WHERE email=${credentials.email}
-                `;
-                if (!rows[0]) {
+                const [user] = await db.select().from(usersTable).where(eq(usersTable.email, credentials.email)).limit(1);
+
+                if (!user) {
                     return null;
                 }
 
-                const passwordMatch = await compare(credentials.password, rows[0].password);
+                const passwordMatch = await compare(credentials.password, user.password);
 
                 if (!passwordMatch) {
                     return null;
                 }
 
                 return {
-                    id: rows[0].id,
-                    email: rows[0].email,
-                    name: rows[0].name,
+                    id: user.id.toString(),
+                    email: user.email,
+                    name: user.name || undefined,
                 };
             }
         })

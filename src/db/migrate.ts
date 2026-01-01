@@ -1,10 +1,10 @@
 import config from "$/drizzle.config";
+import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
-import { VercelPool } from "@vercel/postgres";
 import env from "@/lib/env";
 
-const pool = new VercelPool({
+const pool = new Pool({
     connectionString: env.POSTGRES_URL,
 });
 

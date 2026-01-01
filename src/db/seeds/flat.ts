@@ -1,7 +1,10 @@
-import { DB } from "@/db";
+import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { flatsTable } from "@/db/schema";
 import { faker } from "@faker-js/faker";
 import { FlatSchema } from "../schema/flat";
+import * as schema from "@/db/schema";
+
+type DB = NodePgDatabase<typeof schema>;
 
 const mock = async () => {
     const data: FlatSchema[] = [];
