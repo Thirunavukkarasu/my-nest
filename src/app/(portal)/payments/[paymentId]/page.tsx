@@ -1,14 +1,16 @@
 import { notFound } from "next/navigation"
 import Link from 'next/link'
-import { Calendar, DollarSign, CreditCard, CheckCircle, XCircle, Home, User, FileText, ArrowLeft, MoreVertical, Pencil, Trash } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Calendar, DollarSign, CreditCard, CheckCircle, XCircle, Home, FileText, ArrowLeft, MoreVertical, Pencil, Trash, } from 'lucide-react'
+import { eq } from "drizzle-orm"
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { db } from "@/db"
 import { paymentsTable } from "@/db/schema"
-import { eq } from "drizzle-orm"
+
 
 async function getPaymentData(paymentId: string) {
     const paymentData = await db.query.paymentsTable.findFirst({
@@ -19,6 +21,32 @@ async function getPaymentData(paymentId: string) {
         },
     })
     return paymentData
+}
+
+function ReceiptPreview({ url }: { url: string }) {
+    if (!url) return null
+
+    const isPDF = url.toLowerCase().endsWith('.pdf')
+
+    return (
+        <div className="h-full w-full rounded-lg border bg-background p-2">
+            <div className="aspect-[3/4] w-full h-full relative rounded overflow-hidden">
+                {isPDF ? (
+                    <iframe
+                        src={`${url}#toolbar=0`}
+                        className="w-full h-full"
+                        title="Receipt PDF"
+                    />
+                ) : (
+                    <img
+                        src={url}
+                        alt="Receipt"
+                        className="w-full h-full object-contain"
+                    />
+                )}
+            </div>
+        </div>
+    )
 }
 
 export default async function PaymentDetailPage({ params }: { params: { paymentId: string } }) {
@@ -37,12 +65,13 @@ export default async function PaymentDetailPage({ params }: { params: { paymentI
         paymentMethod,
         referenceNumber,
         notes,
+        receiptUrl,
         flat,
         resident,
     } = paymentData
 
     return (
-        <div className="container py-6 px-10">
+        <div className="container py-6 px-4 md:px-10">
             <div className="mb-6">
                 <Button variant="ghost" asChild>
                     <Link href="/payments" className="flex items-center space-x-2">
@@ -55,7 +84,7 @@ export default async function PaymentDetailPage({ params }: { params: { paymentI
                 {/* Header Section */}
                 <div className="flex items-start justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold">Payment Details</h1>
+                        <h1 className="text-2xl md:text-3xl font-bold">Payment Details</h1>
                         <p className="text-muted-foreground">Detailed information about this payment</p>
                         <div className="mt-2">
                             <Badge variant={status === "Paid" ? "default" : "secondary"}>
@@ -64,7 +93,7 @@ export default async function PaymentDetailPage({ params }: { params: { paymentI
                                 ) : (
                                     <XCircle className="mr-2 h-4 w-4" />
                                 )}
-                                {status || 'Paid'}
+                                {status}
                             </Badge>
                         </div>
                     </div>
@@ -114,7 +143,7 @@ export default async function PaymentDetailPage({ params }: { params: { paymentI
                             <CreditCard className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{paymentType || 'Online'}</div>
+                            <div className="text-2xl font-bold capitalize">{paymentType || 'Online'}</div>
                         </CardContent>
                     </Card>
                     <Card>
@@ -123,19 +152,41 @@ export default async function PaymentDetailPage({ params }: { params: { paymentI
                             <CreditCard className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{paymentMethod || 'UPI'}</div>
+                            <div className="text-2xl font-bold uppercase">{paymentMethod || 'UPI'}</div>
                         </CardContent>
                     </Card>
                 </div>
 
-                {/* Payment Details */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Payment Details</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid gap-4 md:grid-cols-2">
+                {/* Payment Details with Receipt */}
+                <div className="grid gap-6 lg:grid-cols-2">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Payment Details</CardTitle>
+                        </CardHeader>
+                        <CardContent>
                             <div className="space-y-4">
+
+                                <div className="flex items-center space-x-4">
+                                    <Home className="h-5 w-5 text-muted-foreground" />
+                                    <div>
+                                        <p className="text-sm font-medium">Flat Number: {flat.flatNumber}</p>
+                                        <p className="text-sm text-muted-foreground">Monthly Rent: ${flat.monthlyRent}</p>
+                                        <p className="text-sm text-muted-foreground">Maintenance: ${flat.monthlyMaintenanceCharge}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center space-x-4">
+                                    <Avatar className="h-5 w-5">
+                                        <AvatarImage src={`/placeholder.svg?height=40&width=40`} alt={`${resident.firstName} ${resident.lastName}`} />
+                                        <AvatarFallback>{resident.firstName[0]}{resident.lastName[0]}</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p className="text-sm font-medium">{`${resident.firstName} ${resident.lastName}`}</p>
+                                        <p className="text-sm text-muted-foreground">Lease Start: {new Date(resident.leaseStartDate).toLocaleDateString()}</p>
+                                        <p className="text-sm text-muted-foreground">
+                                            Lease End: {resident.leaseEndDate ? new Date(resident.leaseEndDate).toLocaleDateString() : "N/A"}
+                                        </p>
+                                    </div>
+                                </div>
                                 <div className="flex items-center space-x-4">
                                     <Calendar className="h-5 w-5 text-muted-foreground" />
                                     <div>
@@ -152,63 +203,33 @@ export default async function PaymentDetailPage({ params }: { params: { paymentI
                                         <p className="text-sm text-muted-foreground">{referenceNumber || "N/A"}</p>
                                     </div>
                                 </div>
-                            </div>
-                            {notes && (
-                                <div className="space-y-4">
-                                    <div className="flex items-center space-x-4">
-                                        <FileText className="h-5 w-5 text-muted-foreground" />
+                                {notes && (
+                                    <div className="flex items-start space-x-4">
+                                        <FileText className="h-5 w-5 text-muted-foreground mt-0.5" />
                                         <div>
                                             <p className="text-sm font-medium">Notes</p>
                                             <p className="text-sm text-muted-foreground">{notes}</p>
                                         </div>
                                     </div>
-                                </div>
-                            )}
-                        </div>
-                    </CardContent>
-                </Card>
-
-                {/* Associated Entities */}
-                <div className="grid gap-6 md:grid-cols-2">
-                    {/* Associated Flat */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Associated Flat</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-center space-x-4">
-                                <Home className="h-10 w-10 text-muted-foreground" />
-                                <div>
-                                    <p className="text-sm font-medium">Flat Number: {flat.flatNumber}</p>
-                                    <p className="text-sm text-muted-foreground">Monthly Rent: ${flat.monthlyRent}</p>
-                                    <p className="text-sm text-muted-foreground">Maintenance: ${flat.monthlyMaintenanceCharge}</p>
-                                </div>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
 
-                    {/* Associated Resident */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Associated Resident</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-center space-x-4">
-                                <Avatar className="h-10 w-10">
-                                    <AvatarImage src={`/placeholder.svg?height=40&width=40`} alt={`${resident.firstName} ${resident.lastName}`} />
-                                    <AvatarFallback>{resident.firstName[0]}{resident.lastName[0]}</AvatarFallback>
-                                </Avatar>
-                                <div>
-                                    <p className="text-sm font-medium">{`${resident.firstName} ${resident.lastName}`}</p>
-                                    <p className="text-sm text-muted-foreground">Lease Start: {new Date(resident.leaseStartDate).toLocaleDateString()}</p>
-                                    <p className="text-sm text-muted-foreground">
-                                        Lease End: {resident.leaseEndDate ? new Date(resident.leaseEndDate).toLocaleDateString() : "N/A"}
-                                    </p>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+
+                    {receiptUrl && (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Receipt</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <ReceiptPreview url={receiptUrl} />
+                            </CardContent>
+                        </Card>
+                    )}
                 </div>
+
+
             </div>
         </div>
     )

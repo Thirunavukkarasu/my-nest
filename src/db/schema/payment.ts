@@ -16,6 +16,7 @@ export const paymentsTable = pgTable("payments", {
     status: varchar("status", { length: 20 }),
     paymentMethod: varchar("payment_method", { length: 50 }),
     referenceNumber: varchar("reference_number", { length: 100 }),
+    receiptUrl: varchar("receipt_url", { length: 255 }),
     notes: text("notes"),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
