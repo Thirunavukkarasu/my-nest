@@ -1,49 +1,83 @@
-import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { apiClient } from "@/lib/api";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function LoginScreen() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = () => {
-    if (!username || !password) {
-      Alert.alert('Error', 'Please enter both username and password');
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please enter both email and password");
       return;
     }
-    
-    // Simple authentication - in production, use proper auth
-    if (username && password) {
-      router.replace('/(tabs)');
+
+    try {
+      setLoading(true);
+      // Note: NextAuth uses a different flow, so we'll need to adapt this
+      // For now, we'll use a simple check. Later we can implement proper JWT auth
+      const response = await apiClient.login(email, password);
+
+      if (response.error) {
+        Alert.alert("Error", response.error || "Invalid credentials");
+        return;
+      }
+
+      // If login successful, navigate to tabs
+      // TODO: Store auth token/session
+      router.replace("/(tabs)");
+    } catch (error) {
+      Alert.alert("Error", "Failed to login. Please try again.");
+      console.error("Login error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       className="flex-1 bg-white"
     >
       <View className="flex-1 justify-center px-6">
         <View className="mb-8">
-          <Text className="text-4xl font-bold text-gray-900 mb-2">RR Enclave</Text>
-          <Text className="text-lg text-gray-600">Apartment Management System</Text>
+          <Text className="text-4xl font-bold text-gray-900 mb-2">
+            RR Enclave
+          </Text>
+          <Text className="text-lg text-gray-600">
+            Apartment Management System
+          </Text>
         </View>
 
         <View className="mb-6">
-          <Text className="text-sm font-medium text-gray-700 mb-2">Username</Text>
+          <Text className="text-sm font-medium text-gray-700 mb-2">Email</Text>
           <TextInput
             className="border border-gray-300 rounded-lg px-4 py-3 text-base bg-white"
-            placeholder="Enter your username"
-            value={username}
-            onChangeText={setUsername}
+            placeholder="Enter your email"
+            value={email}
+            onChangeText={setEmail}
             autoCapitalize="none"
             autoCorrect={false}
+            keyboardType="email-address"
           />
         </View>
 
         <View className="mb-6">
-          <Text className="text-sm font-medium text-gray-700 mb-2">Password</Text>
+          <Text className="text-sm font-medium text-gray-700 mb-2">
+            Password
+          </Text>
           <TextInput
             className="border border-gray-300 rounded-lg px-4 py-3 text-base bg-white"
             placeholder="Enter your password"
@@ -57,16 +91,18 @@ export default function LoginScreen() {
 
         <TouchableOpacity
           onPress={handleLogin}
-          className="bg-blue-600 rounded-lg py-4 items-center mb-4"
+          disabled={loading}
+          className={`bg-blue-600 rounded-lg py-4 items-center mb-4 ${
+            loading ? "opacity-50" : ""
+          }`}
         >
-          <Text className="text-white text-lg font-semibold">Login</Text>
+          {loading ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text className="text-white text-lg font-semibold">Login</Text>
+          )}
         </TouchableOpacity>
-
-        <Text className="text-center text-gray-500 text-sm">
-          For demo: Enter any username and password
-        </Text>
       </View>
     </KeyboardAvoidingView>
   );
 }
-
