@@ -57,6 +57,13 @@
       "when": 1767326807953,
       "tag": "0007_known_stephen_strange",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1767341774407,
+      "tag": "0008_milky_vindicator",
+      "breakpoints": true
     }
   ]
 }

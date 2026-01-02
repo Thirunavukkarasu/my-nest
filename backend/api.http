@@ -1,5 +1,5 @@
-@baseUrl = http://localhost:3000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsIm5hbWUiOiJUZXN0IiwiaWF0IjoxNzY3MzA0MzY4LCJleHAiOjE3Njc5MDkxNjh9.eA2UERUoHKoH3qCzwLecxna1Fda1Z5DyAyeSa7YNfWY
+@baseUrl = https://api-hcgdo6iyc-thirunavukkarasus-projects.vercel.app
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsIm5hbWUiOiJUZXN0IiwiaWF0IjoxNzY3MzI5MTQwLCJleHAiOjE3Njc5MzM5NDB9.NCARJx0AFPgaCPBrjevnCpinuNwpTktit_Ipcg7vR6w
 
 ### Register user
 
