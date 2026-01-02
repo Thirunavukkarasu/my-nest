@@ -1,6 +1,7 @@
 {
   "bunVersion": "1.x",
   "buildCommand": "echo 'No build needed - Bun handles TypeScript natively'",
+  "devCommand": "bun run api/index.ts",
   "rewrites": [
     {
       "source": "/(.*)",

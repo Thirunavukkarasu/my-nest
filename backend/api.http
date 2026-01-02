@@ -1,0 +1,222 @@
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsIm5hbWUiOiJUZXN0IiwiaWF0IjoxNzY3MzA0MzY4LCJleHAiOjE3Njc5MDkxNjh9.eA2UERUoHKoH3qCzwLecxna1Fda1Z5DyAyeSa7YNfWY
+
+### Register user
+
+POST {{baseUrl}}/api/register HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Test",
+    "email": "test@gmail.com",
+    "password": "changeme"
+}
+
+### Login user
+
+POST {{baseUrl}}/api/login HTTP/1.1
+content-type: application/json
+
+{
+    "email": "test@gmail.com",
+    "password": "changeme"
+}
+
+### Get all flats (requires authentication)
+# First login to get token, then use it in Authorization header
+
+POST {{baseUrl}}/api/flats HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{token}}
+
+{
+   "page": 1,
+   "limit": 10,
+   "searchCriterias": [],
+   "sortCriterias": []
+}
+
+### Get all flats
+
+POST {{baseUrl}}/api/flats HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{token}}
+
+{
+   "page": 1,
+   "limit": 10,
+   "searchCriterias": [
+         {
+              "columnName": "flatNumber",
+              "columnOperator": "contains",
+              "columnValue": "G"
+         }
+   ],
+    "sortCriterias": [{
+        "columnName": "createdAt",
+        "columnOrder": "desc"
+    }]
+}
+
+### Create a flat
+
+POST {{baseUrl}}/api/flats/mutate HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "floorNumber": 1,
+    "flatNumber": "G004"
+}
+
+### Update a flat
+
+PUT {{baseUrl}}/api/flats/mutate HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "flatId": 1,
+    "status": "vacant"
+}
+
+### Delete a flat
+
+DELETE {{baseUrl}}/api/flats/mutate/1 HTTP/1.1
+Authorization: Bearer {{token}}
+
+### Get all Residents
+POST {{baseUrl}}/api/residents HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{token}}
+
+{
+   "page": 1,
+   "limit": 10,
+   "searchCriterias": [
+     
+   ],
+    "sortCriterias": [{
+        "columnName": "createdAt",
+        "columnOrder": "desc"
+    }]
+}
+
+### Create a resident
+
+POST {{baseUrl}}/api/residents/mutate HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "flatId": 2,
+    "firstName": "Mithlesh",
+    "lastName": "Kumar",
+    "email": "mithlesh.kumar@gmail.com",
+    "leaseStartDate": "2021-09-01"
+}
+
+### Update a resident
+
+PUT {{baseUrl}}/api/residents/mutate HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "residentId": 1,
+    "firstName": "Mithlesh",
+    "lastName": "Kumar Updated",
+    "email": "mithlesh.kumar.updated@gmail.com",
+    "leaseStartDate": "2021-09-01"
+}
+
+### Delete a resident
+
+DELETE {{baseUrl}}/api/residents/mutate/1 HTTP/1.1
+Authorization: Bearer {{token}}
+
+### Get all Ledger Entries
+
+POST {{baseUrl}}/api/ledger HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{token}}
+
+{
+   "page": 1,
+   "limit": 10,
+   "searchCriterias": [
+     
+   ],
+    "sortCriterias": [{
+        "columnName": "createdAt",
+        "columnOrder": "desc"
+    }]
+}
+
+### Create a ledger entry (Credit - Payment received)
+
+POST {{baseUrl}}/api/ledger/mutate HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "transactionDate": "2021-09-01",
+    "entryType": "credit",
+    "category": "maintenance",
+    "flatId": 2,
+    "residentId": 1,
+    "amount": "1000.00",
+    "status": "completed",
+    "paymentMethod": "UPI"
+}
+
+### Create a ledger entry (Debit - Expense)
+
+POST {{baseUrl}}/api/ledger/mutate HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "transactionDate": "2021-09-01",
+    "entryType": "debit",
+    "category": "utilities",
+    "expenseCategory": "electricity",
+    "amount": "500.00",
+    "status": "completed",
+    "paymentMethod": "bank_transfer",
+    "paidBy": "Admin"
+}
+
+### Update a ledger entry
+
+PUT {{baseUrl}}/api/ledger/mutate HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "ledgerId": 1,
+    "amount": "1500.00",
+    "status": "completed",
+    "paymentMethod": "UPI"
+}
+
+### Delete a ledger entry
+
+DELETE {{baseUrl}}/api/ledger/mutate/1 HTTP/1.1
+Authorization: Bearer {{token}}
+
+### Get current balance
+
+GET {{baseUrl}}/api/ledger/balance HTTP/1.1
+Authorization: Bearer {{token}}
+
+### Generate monthly maintenance entries
+
+POST {{baseUrl}}/api/ledger/generate-monthly-maintenance HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "month": "01",
+    "year": "2024"
+}

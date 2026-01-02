@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api";
+import { storage } from "@/lib/storage";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -26,8 +27,6 @@ export default function LoginScreen() {
 
     try {
       setLoading(true);
-      // Note: NextAuth uses a different flow, so we'll need to adapt this
-      // For now, we'll use a simple check. Later we can implement proper JWT auth
       const response = await apiClient.login(email, password);
 
       if (response.error) {
@@ -35,8 +34,15 @@ export default function LoginScreen() {
         return;
       }
 
-      // If login successful, navigate to tabs
-      // TODO: Store auth token/session
+      // Store token and user data
+      if (response.data?.token) {
+        apiClient.setAuthToken(response.data.token);
+      }
+      if (response.data?.user) {
+        await storage.setUser(response.data.user);
+      }
+
+      // Navigate to tabs after successful login
       router.replace("/(tabs)");
     } catch (error) {
       Alert.alert("Error", "Failed to login. Please try again.");

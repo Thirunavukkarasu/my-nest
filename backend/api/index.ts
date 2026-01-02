@@ -1,53 +1,53 @@
-import express from 'express'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import express from 'express';
+import { authenticateToken } from '../src/middleware/auth';
+import flatsRouter from '../src/routes/flats';
+import ledgerRouter from '../src/routes/ledger';
+import loginRouter from '../src/routes/login';
+import registerRouter from '../src/routes/register';
+import residentsRouter from '../src/routes/residents';
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const app = express();
 
-const app = express()
+// Middleware
+app.use(express.json());
 
-// Home route - HTML
+// Routes
 app.get('/', (req, res) => {
-    res.type('html').send(`
-    <!doctype html>
-    <html>
-      <head>
-        <meta charset="utf-8"/>
-        <title>Express on Vercel</title>
-        <link rel="stylesheet" href="/style.css" />
-      </head>
-      <body>
-        <nav>
-          <a href="/">Home</a>
-          <a href="/about">About</a>
-          <a href="/api-data">API Data</a>
-          <a href="/healthz">Health</a>
-        </nav>
-        <h1>Welcome to Express on Vercel 🚀</h1>
-        <p>This is a minimal example without a database or forms.</p>
-        <img src="/logo.png" alt="Logo" width="120" />
-      </body>
-    </html>
-  `)
-})
-
-app.get('/about', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'components', 'about.htm'))
-})
-
-// Example API endpoint - JSON
-app.get('/api-data', (req, res) => {
-    res.json({
-        message: 'Here is some sample API data',
-        items: ['apple', 'banana', 'cherry'],
-    })
-})
+  res.json({
+    message: 'API is running successfully'
+  });
+});
 
 // Health check
-app.get('/healthz', (req, res) => {
-    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() })
-})
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
-export default app
+// Public routes (no authentication required)
+app.use('/api/register', registerRouter);
+app.use('/api/login', loginRouter);
+
+// Protected routes (authentication required)
+app.use('/api/flats', authenticateToken, flatsRouter);
+app.use('/api/residents', authenticateToken, residentsRouter);
+app.use('/api/ledger', authenticateToken, ledgerRouter);
+
+// For Vercel serverless functions (production), export the app (Vercel handles HTTP)
+// For local development (`pnpm dev` or `vc dev`), start the server
+// 
+// How it works:
+// - `pnpm dev`: Runs directly → `import.meta.main` is true → server starts on port 3000
+// - `vc dev`: Runs directly → `import.meta.main` is true → server starts, Vercel proxies to it
+// - Production: Module imported → `import.meta.main` is false → no server, Vercel handles HTTP
+//
+// Note: `VERCEL=1` is only set in production, not during `vc dev`
+if (import.meta.main) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`📝 API available at http://localhost:${PORT}/api`);
+  });
+}
+
+export default app;
 

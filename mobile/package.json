@@ -21,6 +21,7 @@
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
+    "@react-native-async-storage/async-storage": "^2.1.0",
     "expo": "~54.0.30",
     "expo-build-properties": "~1.0.10",
     "expo-constants": "~18.0.12",
@@ -48,6 +49,7 @@
     "tailwindcss": "^3.4.19"
   },
   "devDependencies": {
+    "@types/node": "^20",
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",

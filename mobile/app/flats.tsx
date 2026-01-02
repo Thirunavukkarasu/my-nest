@@ -119,8 +119,9 @@ export default function FlatsScreen() {
                   </Text>
                   <View className="flex-row flex-wrap">
                     {floorFlats.map((flat) => (
-                      <View
+                      <TouchableOpacity
                         key={flat.id}
+                        onPress={() => router.push(`/flats/${flat.id}`)}
                         className={`w-[48%] bg-white rounded-lg p-3 mb-3 mr-2 border ${
                           flat.isOccupied
                             ? "border-green-300 bg-green-50"
@@ -147,7 +148,7 @@ export default function FlatsScreen() {
                             </Text>
                           </View>
                         </View>
-                      </View>
+                      </TouchableOpacity>
                     ))}
                   </View>
                 </View>

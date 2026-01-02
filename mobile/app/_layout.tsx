@@ -31,6 +31,14 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
+          name="flats/[id]"
+          options={{
+            title: "Flat Details",
+            headerStyle: { backgroundColor: "#fff" },
+            headerTintColor: "#000",
+          }}
+        />
+        <Stack.Screen
           name="residents"
           options={{
             title: "Residents",
