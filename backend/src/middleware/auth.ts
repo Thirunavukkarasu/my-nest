@@ -1,8 +1,9 @@
-import { NextFunction, Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import env from '../lib/env';
+import { getUserPermissions } from '../lib/userPermissions';
 
-// Extend Express Request type to include user
+// Extend Express Request type to include user and permissions
 declare global {
     namespace Express {
         interface Request {
@@ -10,23 +11,26 @@ declare global {
                 id: number;
                 email: string;
                 name: string;
+                roleId?: number | null;
             };
+            permissions?: string[];
         }
     }
 }
 
-export const authenticateToken = (
+export const authenticateToken = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
     if (!token) {
-        return res.status(401).json({
+        res.status(401).json({
             error: 'Access token required'
         });
+        return;
     }
 
     try {
@@ -34,12 +38,18 @@ export const authenticateToken = (
             id: number;
             email: string;
             name: string;
+            roleId?: number | null;
         };
 
         req.user = decoded;
+
+        // Fetch user permissions and attach to request
+        const permissions = await getUserPermissions(decoded.id);
+        req.permissions = permissions;
+
         next();
     } catch (error) {
-        return res.status(403).json({
+        res.status(403).json({
             error: 'Invalid or expired token'
         });
     }

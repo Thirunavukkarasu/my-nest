@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "bun run api/index.ts",
     "build": "echo 'No build needed - Bun handles TypeScript natively'",
-    "start": "bun run api/index.ts",
+    "start": "pnpm db:seed-permissions && bun run api/index.ts",
     "test": "vitest",
     "test:run": "vitest run",
     "test:api": "vitest run src/__tests__/api",
@@ -16,7 +16,8 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:update": "pnpm db:generate && pnpm db:migrate",
-    "db:seed": "tsx src/db/seed.ts"
+    "db:seed": "tsx src/db/seed.ts",
+    "db:seed-permissions": "tsx src/db/seed-permissions.ts"
   },
   "dependencies": {
     "@faker-js/faker": "^9.2.0",

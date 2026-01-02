@@ -5,15 +5,22 @@
   "packageManager": "pnpm@10.11.1",
   "scripts": {
     "start": "expo start",
+    "start:dev": "expo start --dev-client",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "android:dev": "expo run:android",
+    "ios": "expo run:ios",
+    "ios:dev": "expo run:ios",
     "web": "expo start --web",
+    "prebuild": "expo prebuild --clean",
+    "prebuild:android": "expo prebuild --platform android --clean",
+    "prebuild:ios": "expo prebuild --platform ios --clean",
     "lint": "expo lint",
     "build:android:preview": "npx eas-cli build --platform android --profile preview",
     "build:android:production": "npx eas-cli build --platform android --profile production",
     "build:android:preview:local": "npx eas-cli build --platform android --profile preview --local",
     "build:android:production:local": "npx eas-cli build --platform android --profile production --local",
+    "build:dev": "eas build --profile development --platform android",
     "clean": "rm -rf .expo node_modules/.cache"
   },
   "dependencies": {
@@ -46,7 +53,8 @@
     "react-native-screens": "~4.16.0",
     "react-native-web": "~0.21.0",
     "react-native-worklets": "0.5.1",
-    "tailwindcss": "^3.4.19"
+    "tailwindcss": "^3.4.19",
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
     "@types/node": "^20",

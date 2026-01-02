@@ -36,12 +36,15 @@ app.use('/api/ledger', authenticateToken, ledgerRouter);
 // For local development (`pnpm dev` or `vc dev`), start the server
 // 
 // How it works:
-// - `pnpm dev`: Runs directly → `import.meta.main` is true → server starts on port 3000
-// - `vc dev`: Runs directly → `import.meta.main` is true → server starts, Vercel proxies to it
-// - Production: Module imported → `import.meta.main` is false → no server, Vercel handles HTTP
+// - `pnpm dev`: Runs directly → server starts on port 3000
+// - `vc dev`: Runs directly → server starts, Vercel proxies to it
+// - Production: Module imported → no server, Vercel handles HTTP
 //
 // Note: `VERCEL=1` is only set in production, not during `vc dev`
-if (import.meta.main) {
+// Check if we're in a Bun environment and not in Vercel production
+// Use a type assertion for import.meta.main (Bun-specific)
+const isMain = (import.meta as any).main;
+if (isMain && typeof Bun !== 'undefined' && !process.env.VERCEL) {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);

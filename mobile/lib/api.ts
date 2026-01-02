@@ -73,6 +73,7 @@ class ApiClient {
 
     async clearAuth() {
         this.authToken = null;
+        this.tokenLoaded = false; // Reset token loaded flag so token can be reloaded on next login
         await storage.clearAuth();
     }
 
@@ -181,9 +182,9 @@ class ApiClient {
         });
     }
 
-    // Payments API
-    async getPayments(params: PaginationParams = {}): Promise<ApiResponse<PaginatedResponse<any>>> {
-        return this.request<PaginatedResponse<any>>('/api/payments', {
+    // Ledger API
+    async getLedger(params: PaginationParams = {}): Promise<ApiResponse<PaginatedResponse<any>>> {
+        return this.request<PaginatedResponse<any>>('/api/ledger', {
             method: 'POST',
             body: JSON.stringify({
                 page: params.page || 1,
@@ -194,23 +195,29 @@ class ApiClient {
         });
     }
 
-    async createPayment(paymentData: any): Promise<ApiResponse<any>> {
-        return this.request('/api/payments/mutate', {
+    async createLedgerEntry(ledgerData: any): Promise<ApiResponse<any>> {
+        return this.request('/api/ledger/mutate', {
             method: 'POST',
-            body: JSON.stringify(paymentData),
+            body: JSON.stringify(ledgerData),
         });
     }
 
-    async updatePayment(paymentId: number, paymentData: any): Promise<ApiResponse<any>> {
-        return this.request('/api/payments/mutate', {
+    async updateLedgerEntry(ledgerId: number, ledgerData: any): Promise<ApiResponse<any>> {
+        return this.request('/api/ledger/mutate', {
             method: 'PUT',
-            body: JSON.stringify({ paymentId, ...paymentData }),
+            body: JSON.stringify({ ledgerId, ...ledgerData }),
         });
     }
 
-    async deletePayment(paymentId: number): Promise<ApiResponse<any>> {
-        return this.request(`/api/payments/mutate/${paymentId}`, {
+    async deleteLedgerEntry(ledgerId: number): Promise<ApiResponse<any>> {
+        return this.request(`/api/ledger/mutate/${ledgerId}`, {
             method: 'DELETE',
+        });
+    }
+
+    async getLedgerBalance(): Promise<ApiResponse<any>> {
+        return this.request('/api/ledger/balance', {
+            method: 'GET',
         });
     }
 

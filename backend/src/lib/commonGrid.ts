@@ -37,13 +37,33 @@ export interface QueryBuilder<T> {
     execute: () => Promise<PaginationResult<T>>;
 }
 
+// Helper function to convert snake_case to camelCase
+const snakeToCamel = (str: string): string => {
+    return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+};
+
+// Helper function to find column in table (handles both camelCase and snake_case)
+const findColumn = (table: any, columnName: string): any => {
+    // First try the column name as-is (camelCase)
+    if (table[columnName]) {
+        return table[columnName];
+    }
+
+    // If not found, try converting snake_case to camelCase
+    const camelCaseName = snakeToCamel(columnName);
+    if (table[camelCaseName]) {
+        return table[camelCaseName];
+    }
+
+    // If still not found, try the original snake_case (in case Drizzle uses it directly)
+    // This shouldn't happen with Drizzle, but just in case
+    throw new Error(`Invalid column name: ${columnName} (tried: ${columnName}, ${camelCaseName})`);
+};
+
 // Helper Methods for Search, Sort, and Pagination
 const applySearchCriterias = (table: any, searchCriterias: SearchCriteria[]): SQLWrapper[] => {
     return searchCriterias?.map(({ columnName, columnOperator, columnValue }) => {
-        if (!table[columnName]) {
-            throw new Error(`Invalid column name: ${columnName}`);
-        }
-        const columnRef = table[columnName];
+        const columnRef = findColumn(table, columnName);
         let condition: SQL;
         switch (columnOperator.toLowerCase()) {
             case 'contains':
@@ -74,10 +94,8 @@ const applySearchCriterias = (table: any, searchCriterias: SearchCriteria[]): SQ
 
 const applySorting = (table: any, sortCriterias: SortCriteria[]): SQLWrapper[] => {
     return sortCriterias.map(({ columnName, columnOrder }) => {
-        if (!table[columnName]) {
-            throw new Error(`Invalid column name: ${columnName}`);
-        }
-        return columnOrder === 'desc' ? desc(table[columnName]) : asc(table[columnName]);
+        const columnRef = findColumn(table, columnName);
+        return columnOrder === 'desc' ? desc(columnRef) : asc(columnRef);
     });
 };
 
@@ -91,7 +109,10 @@ const applyPagination = (page: number, limit: number) => {
 
 const applySelect = (select: string[], table: any) => {
     return select && select.length > 0
-        ? select.reduce((acc, col) => ({ ...acc, [col]: table[col] }), {})
+        ? select.reduce((acc, col) => {
+            const columnRef = findColumn(table, col);
+            return { ...acc, [col]: columnRef };
+        }, {})
         : undefined;
 };
 

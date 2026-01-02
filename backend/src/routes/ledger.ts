@@ -1,6 +1,7 @@
 import type { InferInsertModel } from 'drizzle-orm';
 import { and, eq, sql } from 'drizzle-orm';
 import express from 'express';
+import { z } from 'zod';
 import { db } from '../db';
 import { ledgerSchema, ledgerTable } from '../db/schema';
 import { customPaginate } from '../lib/customPaginate';
@@ -70,7 +71,7 @@ router.post('/mutate', async (req, res) => {
     } catch (error: any) {
         console.error('Error while creating ledger entry: ', error);
 
-        if (error.name === 'ZodError') {
+        if (error instanceof z.ZodError) {
             return res.status(400).json({
                 message: "Validation error",
                 error: error.errors
@@ -157,7 +158,7 @@ router.put('/mutate', async (req, res) => {
     } catch (error: any) {
         console.error('Error while updating ledger entry: ', error);
 
-        if (error.name === 'ZodError') {
+        if (error instanceof z.ZodError) {
             return res.status(400).json({
                 message: "Validation error",
                 error: error.errors

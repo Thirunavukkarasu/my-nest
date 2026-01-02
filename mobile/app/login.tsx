@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api";
-import { storage } from "@/lib/storage";
+import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -18,6 +18,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const setAuth = useAuthStore((state: any) => state.setAuth);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -38,12 +39,40 @@ export default function LoginScreen() {
       if (response.data?.token) {
         apiClient.setAuthToken(response.data.token);
       }
-      if (response.data?.user) {
-        await storage.setUser(response.data.user);
+
+      // Update Zustand store with user, token, and permissions
+      if (response.data?.user && response.data?.token) {
+        const user = response.data.user;
+        const permissions = user.permissions || [];
+
+        setAuth(
+          {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            mobile: user.mobile,
+            roleId: user.roleId,
+            roleName: user.roleName,
+            createdAt: user.createdAt,
+          },
+          response.data.token,
+          permissions
+        );
       }
 
-      // Navigate to tabs after successful login
-      router.replace("/(tabs)");
+      // Navigate to appropriate layout based on role
+      if (response.data?.user) {
+        const loggedInUser = response.data.user;
+        const roleName = loggedInUser.roleName?.toLowerCase();
+        const isAdmin =
+          roleName === "admin" || roleName === "administrator" || !roleName;
+
+        if (isAdmin) {
+          router.replace("/(admin-tabs)" as any);
+        } else {
+          router.replace("/(resident-tabs)" as any);
+        }
+      }
     } catch (error) {
       Alert.alert("Error", "Failed to login. Please try again.");
       console.error("Login error:", error);

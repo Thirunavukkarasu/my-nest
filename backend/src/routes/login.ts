@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { db } from '../db';
 import { usersTable } from '../db/schema';
 import env from '../lib/env';
+import { getUserWithPermissions } from '../lib/userPermissions';
 
 const router = express.Router();
 express.json();
@@ -43,23 +44,31 @@ router.post('/', async (req, res) => {
             });
         }
 
+        // Get user with permissions
+        const userWithPermissions = await getUserWithPermissions(user.id);
+
         // Generate JWT token
         const token = jwt.sign(
             {
                 id: user.id,
                 email: user.email,
-                name: user.name
+                name: user.name,
+                roleId: user.roleId || null,
             },
             env.JWT_SECRET,
             { expiresIn: '7d' } // Token expires in 7 days
         );
 
-        // Return user data (excluding password) and token
+        // Return user data (excluding password) with permissions and token
         const { password: _, ...userWithoutPassword } = user;
 
         res.status(200).json({
             success: true,
-            user: userWithoutPassword,
+            user: {
+                ...userWithoutPassword,
+                roleName: userWithPermissions?.roleName || null,
+                permissions: userWithPermissions?.permissions || [],
+            },
             token
         });
     } catch (error) {

@@ -32,21 +32,33 @@ export default function FlatsScreen() {
       const response = await apiClient.getFlats({
         page: 1,
         limit: 100, // Get all flats for now
-        sortCriterias: [{ columnName: "floorNumber", columnOrder: "asc" }],
+        sortCriterias: [],
       });
 
       if (response.error) {
-        Alert.alert("Error", response.error);
+        console.error("Flats API Error:", response.error);
+        Alert.alert("Error", response.error || "Failed to load flats");
         return;
       }
+
+      console.log(
+        "Flats API Response:",
+        JSON.stringify(response.data, null, 2)
+      );
 
       if (response.data?.data) {
         const adaptedFlats = adaptFlats(response.data.data);
         setFlats(adaptedFlats);
+      } else {
+        console.warn("No data in response:", response.data);
+        setFlats([]);
       }
     } catch (error) {
-      Alert.alert("Error", "Failed to load flats");
       console.error("Error loading flats:", error);
+      Alert.alert(
+        "Error",
+        "Failed to load flats. Please check your connection."
+      );
     } finally {
       setLoading(false);
     }
