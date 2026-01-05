@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function FlatDetailScreen() {
   const router = useRouter();
@@ -20,6 +21,7 @@ export default function FlatDetailScreen() {
   const [residents, setResidents] = useState<Resident[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (id) {
@@ -31,19 +33,8 @@ export default function FlatDetailScreen() {
     try {
       setLoading(true);
 
-      // Get flat details with relations
-      const flatsResponse = await apiClient.getFlats({
-        page: 1,
-        limit: 100,
-        searchCriterias: [
-          {
-            columnName: "flatId",
-            columnOperator: "equals",
-            columnValue: parseInt(id!).toString(),
-          },
-        ],
-        sortCriterias: [],
-      });
+      // Get flat details with relations using dedicated endpoint
+      const flatsResponse = await apiClient.getFlatById(parseInt(id!));
 
       if (flatsResponse.error) {
         Alert.alert("Error", flatsResponse.error);
@@ -51,8 +42,8 @@ export default function FlatDetailScreen() {
         return;
       }
 
-      if (flatsResponse.data?.data && flatsResponse.data.data.length > 0) {
-        const apiFlat = flatsResponse.data.data[0] as any;
+      if (flatsResponse.data?.data) {
+        const apiFlat = flatsResponse.data.data as any;
         const adaptedFlat = adaptFlat(apiFlat);
         setFlat(adaptedFlat);
 
@@ -349,7 +340,10 @@ export default function FlatDetailScreen() {
       </View>
 
       {/* Action Buttons */}
-      <View className="px-4 pb-6">
+      <View
+        className="px-4"
+        style={{ paddingBottom: Math.max(insets.bottom, 24) }}
+      >
         <TouchableOpacity
           onPress={() => {
             // TODO: Navigate to edit flat screen

@@ -37,7 +37,7 @@ const residentsScreenOptions = {
   headerTintColor: "#000",
 };
 const paymentsScreenOptions = {
-  title: "Payments",
+  title: "Ledger",
   headerStyle: { backgroundColor: "#fff" },
   headerTintColor: "#000",
 };

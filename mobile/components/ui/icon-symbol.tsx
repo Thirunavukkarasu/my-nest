@@ -27,10 +27,17 @@ const MAPPING = {
   "person.2.fill": "people",
   "person.fill": "person",
   "creditcard.fill": "credit-card",
+  "book.fill": "book",
+  "book.closed.fill": "menu-book",
   "gearshape.fill": "settings",
   "exclamationmark.triangle.fill": "warning",
   // Common icons
   plus: "add",
+  "arrow.right.square.fill": "exit-to-app",
+  xmark: "close",
+  "xmark.circle.fill": "cancel",
+  checkmark: "check",
+  "checkmark.circle.fill": "check-circle",
 } as IconMapping;
 
 /**

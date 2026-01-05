@@ -1,4 +1,4 @@
-@baseUrl = https://my-nest-api22.vercel.app
+@baseUrl =  https://my-nest-api22.vercel.app
 @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsIm5hbWUiOiJUZXN0IiwiaWF0IjoxNzY3MzI5MTQwLCJleHAiOjE3Njc5MzM5NDB9.NCARJx0AFPgaCPBrjevnCpinuNwpTktit_Ipcg7vR6w
 
 ### Register user
@@ -58,7 +58,12 @@ Authorization: Bearer {{token}}
     }]
 }
 
-### Create a flat
+### Get flat by ID (with relations - residents, ledgerEntries)
+
+GET {{baseUrl}}/api/flats/1 HTTP/1.1
+Authorization: Bearer {{token}}
+
+### Create a flat (with owner - owner name is required, email and phone are optional)
 
 POST {{baseUrl}}/api/flats/mutate HTTP/1.1
 content-type: application/json
@@ -66,7 +71,28 @@ Authorization: Bearer {{token}}
 
 {
     "floorNumber": 1,
-    "flatNumber": "G004"
+    "flatNumber": "G004",
+    "owner": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "john.doe@example.com",
+        "phone": "+1234567890"
+    }
+}
+
+### Create a flat (minimal owner - only name required)
+
+POST {{baseUrl}}/api/flats/mutate HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "floorNumber": 2,
+    "flatNumber": "201",
+    "owner": {
+        "firstName": "Jane",
+        "lastName": "Smith"
+    }
 }
 
 ### Update a flat

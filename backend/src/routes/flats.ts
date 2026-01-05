@@ -1,12 +1,55 @@
 import type { InferInsertModel } from 'drizzle-orm';
 import { eq } from 'drizzle-orm';
 import express from 'express';
+import { z } from 'zod';
 import { db } from '../db';
-import { flatSchema, flatsTable } from '../db/schema';
+import { flatSchema, flatsTable, residentsTable } from '../db/schema';
 import { customPaginate } from '../lib/customPaginate';
 
 const router = express.Router();
 express.json();
+
+// GET /api/flats/:id - Get single flat by ID with relations
+router.get('/:id', async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+
+        if (!id || isNaN(id)) {
+            return res.status(400).json({
+                message: "Validation error",
+                error: "Invalid id parameter"
+            });
+        }
+
+        // Use Drizzle's relational query API to fetch flat with relations
+        const flat = await db.query.flatsTable.findFirst({
+            where: (flats, { eq }) => eq(flats.flatId, id),
+            with: {
+                residents: true,
+                ledgerEntries: true
+            }
+        });
+
+        if (!flat) {
+            return res.status(404).json({
+                message: "Not found",
+                error: "Flat not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: flat
+        });
+    } catch (error: any) {
+        console.error('Error while getting flat: ', error);
+        res.status(500).json({
+            message: "Error while getting flat",
+            error: error.message || 'Unknown error',
+            details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
+    }
+});
 
 // GET /api/flats - List flats with pagination
 router.post('/', async (req, res) => {
@@ -27,26 +70,76 @@ router.post('/', async (req, res) => {
         res.status(200).json(result);
     } catch (error: any) {
         console.error('Error while getting data: ', error);
+        console.error('Error stack: ', error.stack);
+        console.error('Error details: ', {
+            message: error.message,
+            code: error.code,
+            name: error.name,
+            cause: error.cause
+        });
         res.status(500).json({
             message: "Error while getting data",
-            error: error.message
+            error: error.message || 'Unknown error',
+            details: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
 });
 
-// POST /api/flats/mutate - Create flat
+// Validation schema for flat creation with owner
+const createFlatWithOwnerSchema = flatSchema.extend({
+    owner: z.object({
+        firstName: z.string().min(1, "Owner first name is required"),
+        lastName: z.string().min(1, "Owner last name is required"),
+        email: z.string().email().optional().or(z.literal("")).nullable(),
+        phone: z.string().optional().or(z.literal("")).nullable(),
+        dateOfBirth: z.string().date().optional().nullable(),
+    }),
+});
+
+// POST /api/flats/mutate - Create flat with owner
 router.post('/mutate', async (req, res) => {
     try {
         const body = req.body;
-        const validatedData = flatSchema.parse(body);
 
-        const [newFlat] = await db.insert(flatsTable)
-            .values(validatedData as InferInsertModel<typeof flatsTable>)
-            .returning();
+        // Validate request body including owner
+        const validatedData = createFlatWithOwnerSchema.parse(body);
+        const { owner, ...flatData } = validatedData;
+
+        // Use transaction to ensure both flat and owner are created together
+        const result = await db.transaction(async (tx) => {
+            // Create flat first
+            const [newFlat] = await tx.insert(flatsTable)
+                .values(flatData as InferInsertModel<typeof flatsTable>)
+                .returning();
+
+            // Create owner record
+            // Convert empty strings to null for optional fields
+            const ownerData = {
+                flatId: newFlat.flatId,
+                firstName: owner.firstName,
+                lastName: owner.lastName,
+                email: owner.email && owner.email.trim() !== "" ? owner.email : null,
+                phone: owner.phone && owner.phone.trim() !== "" ? owner.phone : null,
+                dateOfBirth: owner.dateOfBirth && owner.dateOfBirth.trim() !== "" ? owner.dateOfBirth : null,
+                residentType: 'owner' as const,
+                status: 'active' as const,
+                leaseStartDate: new Date().toISOString().split('T')[0], // Use current date as lease start
+                isPrimaryTenant: false,
+            };
+
+            const [newOwner] = await tx.insert(residentsTable)
+                .values(ownerData as InferInsertModel<typeof residentsTable>)
+                .returning();
+
+            return { flat: newFlat, owner: newOwner };
+        });
 
         res.status(201).json({
             success: true,
-            data: newFlat
+            data: {
+                flat: result.flat,
+                owner: result.owner
+            }
         });
     } catch (error: any) {
         console.error('Error while creating flat: ', error);

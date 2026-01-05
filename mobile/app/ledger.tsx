@@ -1,5 +1,6 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { apiClient } from "@/lib/api";
+import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -12,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface LedgerEntry {
   ledgerId: number;
@@ -28,6 +30,8 @@ interface LedgerEntry {
 
 export default function LedgerScreen() {
   const router = useRouter();
+  const isImpersonating = useAuthStore((state) => state.isImpersonating);
+  const impersonatedFlatId = useAuthStore((state) => state.impersonatedFlatId);
   const [entries, setEntries] = useState<LedgerEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -43,14 +47,26 @@ export default function LedgerScreen() {
 
   useEffect(() => {
     loadLedger();
-  }, []);
+  }, [impersonatedFlatId, isImpersonating]);
 
   const loadLedger = async () => {
     try {
       setLoading(true);
+
+      // Build search criteria - filter by flatId if impersonating
+      const searchCriterias = [];
+      if (isImpersonating && impersonatedFlatId) {
+        searchCriterias.push({
+          columnName: "flatId",
+          columnOperator: "equals" as const,
+          columnValue: impersonatedFlatId.toString(),
+        });
+      }
+
       const response = await apiClient.getLedger({
         page: 1,
         limit: 100,
+        searchCriterias,
         sortCriterias: [{ columnName: "transactionDate", columnOrder: "desc" }],
       });
 
@@ -143,7 +159,7 @@ export default function LedgerScreen() {
   };
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <SafeAreaView className="flex-1 bg-gray-50" edges={["top"]}>
       <View className="bg-white px-4 py-3 border-b border-gray-200">
         <View className="flex-row justify-between items-center">
           <Text className="text-2xl font-bold text-gray-900">Ledger</Text>
@@ -304,8 +320,11 @@ export default function LedgerScreen() {
         transparent
         onRequestClose={() => setShowAddModal(false)}
       >
-        <View className="flex-1 bg-black/50 justify-end">
-          <View className="bg-white rounded-t-3xl p-6">
+        <SafeAreaView
+          className="flex-1 bg-black/50 justify-end"
+          edges={["bottom"]}
+        >
+          <View className="bg-white rounded-t-3xl p-6 pb-8">
             <Text className="text-2xl font-bold text-gray-900 mb-4">
               Add Ledger Entry
             </Text>
@@ -446,8 +465,8 @@ export default function LedgerScreen() {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </SafeAreaView>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }

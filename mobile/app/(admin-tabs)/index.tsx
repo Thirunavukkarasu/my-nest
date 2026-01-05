@@ -6,6 +6,7 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "expo-router";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface FeatureCardProps {
   title: string;
@@ -65,10 +66,10 @@ export default function AdminDashboardScreen() {
       color: "bg-green-500",
     },
     {
-      title: "Payments",
+      title: "Ledger",
       description: "Track maintenance payments & expenses",
       icon: "creditcard.fill",
-      route: "/payments",
+      route: "/(admin-tabs)/ledger",
       color: "bg-purple-500",
     },
     {
@@ -81,7 +82,7 @@ export default function AdminDashboardScreen() {
   ];
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <SafeAreaView className="flex-1 bg-gray-50" edges={["top"]}>
       <ScrollView className="flex-1" contentContainerClassName="p-4">
         <View className="mb-6">
           <Text className="text-3xl font-bold text-gray-900 mb-2">
@@ -124,6 +125,6 @@ export default function AdminDashboardScreen() {
           />
         ))}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }

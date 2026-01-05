@@ -6,6 +6,8 @@ import { ActivityIndicator, View } from "react-native";
 export default function Index() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
+  const isImpersonating = useAuthStore((state) => state.isImpersonating);
+  const impersonatedFlatId = useAuthStore((state) => state.impersonatedFlatId);
   const initialize = useAuthStore((state) => state.initialize);
   const [isInitializing, setIsInitializing] = useState(true);
 
@@ -43,12 +45,18 @@ export default function Index() {
     );
   }
 
-  // If authenticated, redirect to appropriate layout based on role
+  // If authenticated, redirect to appropriate layout based on role and impersonation
   if (isAuthenticated && user) {
     const roleName = user.roleName?.toLowerCase();
     const isAdmin =
       roleName === "admin" || roleName === "administrator" || !roleName;
 
+    // If admin is impersonating AND has selected a flat, show resident view
+    if (isImpersonating && isAdmin && impersonatedFlatId) {
+      return <Redirect href={"/(resident-tabs)" as any} />;
+    }
+
+    // Otherwise, show appropriate view based on role
     if (isAdmin) {
       return <Redirect href={"/(admin-tabs)" as any} />;
     } else {

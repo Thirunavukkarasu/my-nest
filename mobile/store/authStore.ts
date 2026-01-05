@@ -25,11 +25,15 @@ export interface AuthState {
     token: string | null;
     permissions: string[];
     isAuthenticated: boolean;
+    isImpersonating: boolean; // Admin impersonating as resident
+    impersonatedFlatId: number | null; // Selected flat ID when impersonating
 
     // Actions
     setAuth: (user: User, token: string, permissions: string[]) => void;
     setPermissions: (permissions: string[]) => void;
     clearAuth: () => Promise<void>;
+    toggleImpersonate: () => void; // Toggle impersonation mode
+    setImpersonatedFlatId: (flatId: number | null) => void; // Set impersonated flat ID
     hasPermission: (permission: Permission | string) => boolean;
     hasAnyPermission: (permissions: Permission[] | string[]) => boolean;
     hasAllPermissions: (permissions: Permission[] | string[]) => boolean;
@@ -52,6 +56,8 @@ export const useAuthStore = create<AuthState>()(
             token: null,
             permissions: [],
             isAuthenticated: false,
+            isImpersonating: false,
+            impersonatedFlatId: null,
 
             // Set authentication data
             setAuth: (user, token, permissions) => {
@@ -83,7 +89,30 @@ export const useAuthStore = create<AuthState>()(
                     token: null,
                     permissions: [],
                     isAuthenticated: false,
+                    isImpersonating: false,
+                    impersonatedFlatId: null,
                 });
+            },
+
+            // Toggle impersonation mode (admin only)
+            toggleImpersonate: () => {
+                const { user } = get();
+                const roleName = user?.roleName?.toLowerCase();
+                const isAdmin = roleName === "admin" || roleName === "administrator" || !roleName;
+
+                // Only allow impersonation for admins
+                if (isAdmin) {
+                    set((state) => ({
+                        isImpersonating: !state.isImpersonating,
+                        // Clear flat selection when disabling impersonation
+                        impersonatedFlatId: !state.isImpersonating ? state.impersonatedFlatId : null,
+                    }));
+                }
+            },
+
+            // Set impersonated flat ID
+            setImpersonatedFlatId: (flatId) => {
+                set({ impersonatedFlatId: flatId });
             },
 
             // Check if user has a specific permission
@@ -154,6 +183,8 @@ export const useAuthStore = create<AuthState>()(
                 token: state.token,
                 permissions: state.permissions,
                 isAuthenticated: state.isAuthenticated,
+                isImpersonating: state.isImpersonating,
+                impersonatedFlatId: state.impersonatedFlatId,
             }),
         }
     )

@@ -3,9 +3,19 @@
  * Overview for resident users showing their flat and payment information
  */
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { adaptFlats } from "@/lib/adapters";
+import { apiClient } from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
+import { Flat } from "@/types";
 import { useRouter } from "expo-router";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface QuickActionProps {
   title: string;
@@ -38,6 +48,41 @@ function QuickAction({ title, icon, onPress, color }: QuickActionProps) {
 export default function ResidentHomeScreen() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
+  const isImpersonating = useAuthStore((state) => state.isImpersonating);
+  const impersonatedFlatId = useAuthStore((state) => state.impersonatedFlatId);
+  const [flat, setFlat] = useState<Flat | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadFlatData();
+  }, [impersonatedFlatId, isImpersonating]);
+
+  const loadFlatData = async () => {
+    if (!isImpersonating || !impersonatedFlatId) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await apiClient.getFlatById(impersonatedFlatId);
+
+      if (response.error) {
+        console.error("Error loading flat:", response.error);
+        setLoading(false);
+        return;
+      }
+
+      if (response.data?.data) {
+        const adaptedFlats = adaptFlats([response.data.data]);
+        setFlat(adaptedFlats[0]);
+      }
+    } catch (error) {
+      console.error("Error loading flat data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View className="flex-1 bg-gray-50">
@@ -53,29 +98,53 @@ export default function ResidentHomeScreen() {
 
         {/* Quick Stats */}
         <View className="mb-6">
-          <View className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 mb-4">
-            <Text className="text-lg font-semibold text-gray-900 mb-3">
-              My Flat
-            </Text>
-            <View className="flex-row justify-between items-center mb-2">
-              <Text className="text-sm text-gray-600">Flat Number</Text>
-              <Text className="text-base font-semibold text-gray-900">-</Text>
-            </View>
-            <View className="flex-row justify-between items-center mb-2">
-              <Text className="text-sm text-gray-600">Monthly Maintenance</Text>
-              <Text className="text-base font-semibold text-gray-900">
-                ₹2,500
+          {loading ? (
+            <View className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 mb-4 items-center justify-center">
+              <ActivityIndicator size="small" color="#3b82f6" />
+              <Text className="text-sm text-gray-600 mt-2">
+                Loading flat data...
               </Text>
             </View>
-            <View className="flex-row justify-between items-center">
-              <Text className="text-sm text-gray-600">Status</Text>
-              <View className="bg-green-100 px-3 py-1 rounded-full">
-                <Text className="text-xs font-semibold text-green-800">
-                  Current
+          ) : flat ? (
+            <View className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 mb-4">
+              <Text className="text-lg font-semibold text-gray-900 mb-3">
+                My Flat
+              </Text>
+              <View className="flex-row justify-between items-center mb-2">
+                <Text className="text-sm text-gray-600">Flat Number</Text>
+                <Text className="text-base font-semibold text-gray-900">
+                  Floor {flat.floor} - Flat {flat.flatNumber}
                 </Text>
               </View>
+              <View className="flex-row justify-between items-center mb-2">
+                <Text className="text-sm text-gray-600">Status</Text>
+                <View
+                  className={`px-3 py-1 rounded-full ${
+                    flat.isOccupied ? "bg-green-100" : "bg-gray-100"
+                  }`}
+                >
+                  <Text
+                    className={`text-xs font-semibold ${
+                      flat.isOccupied ? "text-green-800" : "text-gray-800"
+                    }`}
+                  >
+                    {flat.isOccupied ? "Occupied" : "Vacant"}
+                  </Text>
+                </View>
+              </View>
             </View>
-          </View>
+          ) : (
+            <View className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 mb-4">
+              <Text className="text-lg font-semibold text-gray-900 mb-3">
+                My Flat
+              </Text>
+              <Text className="text-sm text-gray-600">
+                {isImpersonating
+                  ? "Select a flat to view details"
+                  : "No flat information available"}
+              </Text>
+            </View>
+          )}
 
           <View className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
             <Text className="text-lg font-semibold text-gray-900 mb-3">
@@ -109,7 +178,7 @@ export default function ResidentHomeScreen() {
             onPress={() => router.push("/(resident-tabs)/my-flat" as any)}
           />
           <QuickAction
-            title="Payments"
+            title="Ledger"
             icon="creditcard.fill"
             color="bg-green-500"
             onPress={() => router.push("/(resident-tabs)/payments" as any)}

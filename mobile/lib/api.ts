@@ -129,6 +129,12 @@ class ApiClient {
         });
     }
 
+    async getFlatById(flatId: number): Promise<ApiResponse<any>> {
+        return this.request<any>(`/api/flats/${flatId}`, {
+            method: 'GET',
+        });
+    }
+
     async createFlat(flatData: any): Promise<ApiResponse<any>> {
         return this.request('/api/flats/mutate', {
             method: 'POST',

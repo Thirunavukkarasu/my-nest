@@ -19,8 +19,8 @@ const FlatsIcon = ({ color }: { color: string }) => (
 const ResidentsIcon = ({ color }: { color: string }) => (
   <IconSymbol size={28} name="person.2.fill" color={color} />
 );
-const PaymentsIcon = ({ color }: { color: string }) => (
-  <IconSymbol size={28} name="creditcard.fill" color={color} />
+const LedgerIcon = ({ color }: { color: string }) => (
+  <IconSymbol size={28} name="book.fill" color={color} />
 );
 const SettingsIcon = ({ color }: { color: string }) => (
   <IconSymbol size={28} name="gearshape.fill" color={color} />
@@ -47,9 +47,9 @@ const residentsOptions = {
   tabBarIcon: ResidentsIcon,
 };
 
-const paymentsOptions = {
-  title: "Payments",
-  tabBarIcon: PaymentsIcon,
+const ledgerOptions = {
+  title: "Ledger",
+  tabBarIcon: LedgerIcon,
 };
 
 const settingsOptions = {
@@ -63,7 +63,7 @@ export default function AdminTabLayout() {
       <Tabs.Screen name="index" options={dashboardOptions} />
       <Tabs.Screen name="flats" options={flatsOptions} />
       <Tabs.Screen name="residents" options={residentsOptions} />
-      <Tabs.Screen name="payments" options={paymentsOptions} />
+      <Tabs.Screen name="ledger" options={ledgerOptions} />
       <Tabs.Screen name="settings" options={settingsOptions} />
     </Tabs>
   );

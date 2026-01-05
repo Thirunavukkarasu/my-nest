@@ -9,5 +9,5 @@
     "**/node_modules": true,
     "**/.next": true
   },
-  "cSpell.words": ["Criterias", "neondatabase"]
+  "cSpell.words": ["creditcard", "Criterias", "exclamationmark", "neondatabase"]
 }

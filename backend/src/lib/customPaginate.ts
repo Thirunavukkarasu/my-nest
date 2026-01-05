@@ -70,12 +70,15 @@ const customPaginate = <T>(
                         : and(...whereConditions))
                     : undefined;
 
+                // Note: Drizzle's relational query API (db.query[tableName].findMany) 
+                // doesn't support orderBy parameter directly
+                // We'll fetch without orderBy and sort manually if needed
                 finalQuery = db.query[tableName].findMany({
                     limit: pageSize,
                     offset: offset,
                     with: relations,
                     where: whereClause,
-                    orderBy: orderByConditions.length > 0 ? orderByConditions : undefined,
+                    // orderBy is intentionally omitted - Drizzle relational API doesn't support it
                 });
 
             } else {

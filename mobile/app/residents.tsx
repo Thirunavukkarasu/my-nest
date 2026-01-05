@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ResidentsScreen() {
   const router = useRouter();
@@ -88,7 +89,7 @@ export default function ResidentsScreen() {
   };
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <SafeAreaView className="flex-1 bg-gray-50" edges={["top"]}>
       <View className="bg-white px-4 py-3 border-b border-gray-200">
         <View className="flex-row justify-between items-center">
           <Text className="text-2xl font-bold text-gray-900">Residents</Text>
@@ -183,8 +184,11 @@ export default function ResidentsScreen() {
         transparent
         onRequestClose={() => setShowAddModal(false)}
       >
-        <View className="flex-1 bg-black/50 justify-end">
-          <View className="bg-white rounded-t-3xl p-6 max-h-[90%]">
+        <SafeAreaView
+          className="flex-1 bg-black/50 justify-end"
+          edges={["bottom"]}
+        >
+          <View className="bg-white rounded-t-3xl p-6 pb-8 max-h-[90%]">
             <ScrollView>
               <Text className="text-2xl font-bold text-gray-900 mb-4">
                 Add New Resident
@@ -313,8 +317,8 @@ export default function ResidentsScreen() {
               </View>
             </ScrollView>
           </View>
-        </View>
+        </SafeAreaView>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }

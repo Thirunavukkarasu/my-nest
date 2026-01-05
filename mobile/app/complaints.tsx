@@ -1,36 +1,70 @@
-import { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, Alert } from 'react-native';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Complaint } from '@/types';
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useAuthStore } from "@/store/authStore";
+import { Complaint } from "@/types";
+import { useEffect, useState } from "react";
+import {
+  Alert,
+  Modal,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 // Mock data
 const mockComplaints: Complaint[] = [
   {
-    id: '1',
-    residentId: '1',
-    flatId: '1',
-    title: 'Noise Complaint',
-    description: 'Loud music from neighbor',
-    status: 'open',
-    createdAt: '2024-01-20',
-    updatedAt: '2024-01-20',
+    id: "1",
+    residentId: "1",
+    flatId: "1",
+    title: "Noise Complaint",
+    description: "Loud music from neighbor",
+    status: "open",
+    createdAt: "2024-01-20",
+    updatedAt: "2024-01-20",
   },
 ];
 
 export default function ComplaintsScreen() {
+  const isImpersonating = useAuthStore((state) => state.isImpersonating);
+  const impersonatedFlatId = useAuthStore((state) => state.impersonatedFlatId);
   const [complaints, setComplaints] = useState<Complaint[]>(mockComplaints);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [filter, setFilter] = useState<'all' | 'open' | 'resolved' | 'closed'>('all');
+  const [filter, setFilter] = useState<"all" | "open" | "resolved" | "closed">(
+    "all"
+  );
+  const [loading, setLoading] = useState(false);
   const [newComplaint, setNewComplaint] = useState({
-    residentId: '',
-    flatId: '',
-    title: '',
-    description: '',
+    residentId: "",
+    flatId: impersonatedFlatId?.toString() || "",
+    title: "",
+    description: "",
   });
 
+  useEffect(() => {
+    // Filter complaints by flatId when impersonating
+    if (isImpersonating && impersonatedFlatId) {
+      setComplaints(
+        mockComplaints.filter((c) => c.flatId === impersonatedFlatId.toString())
+      );
+      setNewComplaint((prev) => ({
+        ...prev,
+        flatId: impersonatedFlatId.toString(),
+      }));
+    } else {
+      setComplaints(mockComplaints);
+    }
+  }, [impersonatedFlatId, isImpersonating]);
+
   const handleAddComplaint = () => {
-    if (!newComplaint.residentId || !newComplaint.flatId || !newComplaint.title || !newComplaint.description) {
-      Alert.alert('Error', 'Please fill in all fields');
+    if (
+      !newComplaint.residentId ||
+      !newComplaint.flatId ||
+      !newComplaint.title ||
+      !newComplaint.description
+    ) {
+      Alert.alert("Error", "Please fill in all fields");
       return;
     }
 
@@ -40,20 +74,21 @@ export default function ComplaintsScreen() {
       flatId: newComplaint.flatId,
       title: newComplaint.title,
       description: newComplaint.description,
-      status: 'open',
+      status: "open",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
     setComplaints([...complaints, complaint]);
-    setNewComplaint({ residentId: '', flatId: '', title: '', description: '' });
+    setNewComplaint({ residentId: "", flatId: "", title: "", description: "" });
     setShowAddModal(false);
-    Alert.alert('Success', 'Complaint submitted successfully');
+    Alert.alert("Success", "Complaint submitted successfully");
   };
 
-  const filteredComplaints = filter === 'all'
-    ? complaints
-    : complaints.filter(c => c.status === filter);
+  const filteredComplaints =
+    filter === "all"
+      ? complaints
+      : complaints.filter((c) => c.status === filter);
 
   return (
     <View className="flex-1 bg-gray-50">
@@ -73,15 +108,21 @@ export default function ComplaintsScreen() {
       <ScrollView className="flex-1 p-4">
         <View className="mb-4">
           <View className="flex-row gap-2 flex-wrap">
-            {(['all', 'open', 'resolved', 'closed'] as const).map((status) => (
+            {(["all", "open", "resolved", "closed"] as const).map((status) => (
               <TouchableOpacity
                 key={status}
                 onPress={() => setFilter(status)}
                 className={`px-4 py-2 rounded-lg ${
-                  filter === status ? 'bg-red-600' : 'bg-gray-200'
+                  filter === status ? "bg-red-600" : "bg-gray-200"
                 }`}
               >
-                <Text className={filter === status ? 'text-white font-semibold' : 'text-gray-700'}>
+                <Text
+                  className={
+                    filter === status
+                      ? "text-white font-semibold"
+                      : "text-gray-700"
+                  }
+                >
                   {status.charAt(0).toUpperCase() + status.slice(1)}
                 </Text>
               </TouchableOpacity>
@@ -96,29 +137,47 @@ export default function ComplaintsScreen() {
           >
             <View className="flex-row justify-between items-start mb-2">
               <View className="flex-1">
-                <Text className="text-lg font-semibold text-gray-900">{complaint.title}</Text>
-                <Text className="text-sm text-gray-600">Flat: {complaint.flatId}</Text>
+                <Text className="text-lg font-semibold text-gray-900">
+                  {complaint.title}
+                </Text>
+                <Text className="text-sm text-gray-600">
+                  Flat: {complaint.flatId}
+                </Text>
               </View>
-              <View className={`px-3 py-1 rounded ${
-                complaint.status === 'resolved' ? 'bg-green-100' :
-                complaint.status === 'closed' ? 'bg-gray-100' : 'bg-red-100'
-              }`}>
-                <Text className={`text-xs font-medium ${
-                  complaint.status === 'resolved' ? 'text-green-700' :
-                  complaint.status === 'closed' ? 'text-gray-700' : 'text-red-700'
-                }`}>
-                  {complaint.status.charAt(0).toUpperCase() + complaint.status.slice(1)}
+              <View
+                className={`px-3 py-1 rounded ${
+                  complaint.status === "resolved"
+                    ? "bg-green-100"
+                    : complaint.status === "closed"
+                    ? "bg-gray-100"
+                    : "bg-red-100"
+                }`}
+              >
+                <Text
+                  className={`text-xs font-medium ${
+                    complaint.status === "resolved"
+                      ? "text-green-700"
+                      : complaint.status === "closed"
+                      ? "text-gray-700"
+                      : "text-red-700"
+                  }`}
+                >
+                  {complaint.status.charAt(0).toUpperCase() +
+                    complaint.status.slice(1)}
                 </Text>
               </View>
             </View>
-            <Text className="text-sm text-gray-700 mb-3">{complaint.description}</Text>
+            <Text className="text-sm text-gray-700 mb-3">
+              {complaint.description}
+            </Text>
             <View className="flex-row justify-between items-center">
               <Text className="text-xs text-gray-500">
                 Created: {new Date(complaint.createdAt).toLocaleDateString()}
               </Text>
               {complaint.resolvedAt && (
                 <Text className="text-xs text-gray-500">
-                  Resolved: {new Date(complaint.resolvedAt).toLocaleDateString()}
+                  Resolved:{" "}
+                  {new Date(complaint.resolvedAt).toLocaleDateString()}
                 </Text>
               )}
             </View>
@@ -135,45 +194,63 @@ export default function ComplaintsScreen() {
         <View className="flex-1 bg-black/50 justify-end">
           <View className="bg-white rounded-t-3xl p-6 max-h-[90%]">
             <ScrollView>
-              <Text className="text-2xl font-bold text-gray-900 mb-4">Submit Complaint</Text>
+              <Text className="text-2xl font-bold text-gray-900 mb-4">
+                Submit Complaint
+              </Text>
 
               <View className="mb-4">
-                <Text className="text-sm font-medium text-gray-700 mb-2">Resident ID</Text>
+                <Text className="text-sm font-medium text-gray-700 mb-2">
+                  Resident ID
+                </Text>
                 <TextInput
                   className="border border-gray-300 rounded-lg px-4 py-3 text-base bg-white"
                   placeholder="Enter resident ID"
                   value={newComplaint.residentId}
-                  onChangeText={(text) => setNewComplaint({ ...newComplaint, residentId: text })}
+                  onChangeText={(text) =>
+                    setNewComplaint({ ...newComplaint, residentId: text })
+                  }
                 />
               </View>
 
               <View className="mb-4">
-                <Text className="text-sm font-medium text-gray-700 mb-2">Flat ID</Text>
+                <Text className="text-sm font-medium text-gray-700 mb-2">
+                  Flat ID
+                </Text>
                 <TextInput
                   className="border border-gray-300 rounded-lg px-4 py-3 text-base bg-white"
                   placeholder="Enter flat ID"
                   value={newComplaint.flatId}
-                  onChangeText={(text) => setNewComplaint({ ...newComplaint, flatId: text })}
+                  onChangeText={(text) =>
+                    setNewComplaint({ ...newComplaint, flatId: text })
+                  }
                 />
               </View>
 
               <View className="mb-4">
-                <Text className="text-sm font-medium text-gray-700 mb-2">Title</Text>
+                <Text className="text-sm font-medium text-gray-700 mb-2">
+                  Title
+                </Text>
                 <TextInput
                   className="border border-gray-300 rounded-lg px-4 py-3 text-base bg-white"
                   placeholder="Enter complaint title"
                   value={newComplaint.title}
-                  onChangeText={(text) => setNewComplaint({ ...newComplaint, title: text })}
+                  onChangeText={(text) =>
+                    setNewComplaint({ ...newComplaint, title: text })
+                  }
                 />
               </View>
 
               <View className="mb-6">
-                <Text className="text-sm font-medium text-gray-700 mb-2">Description</Text>
+                <Text className="text-sm font-medium text-gray-700 mb-2">
+                  Description
+                </Text>
                 <TextInput
                   className="border border-gray-300 rounded-lg px-4 py-3 text-base bg-white"
                   placeholder="Describe your complaint"
                   value={newComplaint.description}
-                  onChangeText={(text) => setNewComplaint({ ...newComplaint, description: text })}
+                  onChangeText={(text) =>
+                    setNewComplaint({ ...newComplaint, description: text })
+                  }
                   multiline
                   numberOfLines={4}
                   textAlignVertical="top"
@@ -201,4 +278,3 @@ export default function ComplaintsScreen() {
     </View>
   );
 }
-
