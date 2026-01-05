@@ -64,6 +64,13 @@
       "when": 1767341774407,
       "tag": "0008_milky_vindicator",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1767620206299,
+      "tag": "0009_ancient_darkstar",
+      "breakpoints": true
     }
   ]
 }

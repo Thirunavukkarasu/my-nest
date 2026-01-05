@@ -57,8 +57,10 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.28.5",
     "@types/node": "^20",
     "@types/react": "~19.1.0",
+    "babel-preset-expo": "~54.0.9",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
     "typescript": "~5.9.2"
