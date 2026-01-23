@@ -1,12 +1,11 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { AddVehicleModal } from "@/modules/vehicles/components/AddVehicleModal";
 import { useVehiclesQuery } from "@/modules/vehicles/hooks/useVehiclesQuery";
 import { Vehicle } from "@/types";
 import {
   LegendList,
   LegendListRenderItemProps,
 } from "@legendapp/list";
-import { useState } from "react";
+import * as ExpoRouter from "expo-router";
 import {
   ActivityIndicator,
   Text,
@@ -16,7 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export function VehiclesScreen() {
-  const [showAddModal, setShowAddModal] = useState(false);
+  const router = (ExpoRouter as any).useRouter();
 
   // Fetch vehicles using React Query
   const {
@@ -70,7 +69,7 @@ export function VehiclesScreen() {
         <View className="flex-row justify-between items-center">
           <Text className="text-2xl font-bold text-gray-900">Vehicles</Text>
           <TouchableOpacity
-            onPress={() => setShowAddModal(true)}
+            onPress={() => router.push("/vehicles/add")}
             className="bg-green-600 px-4 py-2 rounded-lg flex-row items-center"
           >
             <IconSymbol name="plus" size={20} color="#FFFFFF" />
@@ -190,10 +189,6 @@ export function VehiclesScreen() {
         />
       )}
 
-      <AddVehicleModal
-        visible={showAddModal}
-        onClose={() => setShowAddModal(false)}
-      />
     </SafeAreaView>
   );
 }

@@ -1,11 +1,10 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { AddLedgerEntryModal } from "@/modules/ledger/components/AddLedgerEntryModal";
-import { useLedgerQuery, LedgerEntry } from "@/modules/ledger/hooks/useLedgerQuery";
+import { LedgerEntry, useLedgerQuery } from "@/modules/ledger/hooks/useLedgerQuery";
 import {
   LegendList,
   LegendListRenderItemProps,
 } from "@legendapp/list";
-import { useQueryClient } from "@tanstack/react-query";
+import * as ExpoRouter from "expo-router";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -16,8 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export function LedgerScreen() {
-  const queryClient = useQueryClient();
-  const [showAddModal, setShowAddModal] = useState(false);
+  const router = (ExpoRouter as any).useRouter();
   const [filter, setFilter] = useState<"all" | "credit" | "debit">("all");
 
   // Fetch ledger entries using React Query
@@ -26,10 +24,6 @@ export function LedgerScreen() {
     isLoading: loading,
     error,
   } = useLedgerQuery();
-
-  const handleEntryAdded = () => {
-    queryClient.invalidateQueries({ queryKey: ["ledger"] });
-  };
 
   const filteredEntries = useMemo(
     () =>
@@ -68,7 +62,7 @@ export function LedgerScreen() {
         <View className="flex-row justify-between items-center">
           <Text className="text-2xl font-bold text-gray-900">Ledger</Text>
           <TouchableOpacity
-            onPress={() => setShowAddModal(true)}
+            onPress={() => router.push("/ledger/add")}
             className="bg-blue-600 px-4 py-2 rounded-lg flex-row items-center"
           >
             <IconSymbol name="plus" size={20} color="#FFFFFF" />
@@ -225,11 +219,6 @@ export function LedgerScreen() {
         </>
       )}
 
-      <AddLedgerEntryModal
-        visible={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onSuccess={handleEntryAdded}
-      />
     </SafeAreaView>
   );
 }

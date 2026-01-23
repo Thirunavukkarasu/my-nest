@@ -1,6 +1,5 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { AddFlatModal } from "@/modules/flats/components/AddFlatModal";
-import { useFlatsQuery, FlatWithOwner } from "@/modules/flats/hooks/useFlatsQuery";
+import { FlatWithOwner, useFlatsQuery } from "@/modules/flats/hooks/useFlatsQuery";
 import {
   LegendList,
   LegendListRenderItemProps,
@@ -19,7 +18,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export function FlatsScreen() {
   const router = (ExpoRouter as any).useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [showAddModal, setShowAddModal] = useState(false);
 
   // Fetch flats using React Query
   const {
@@ -79,7 +77,7 @@ export function FlatsScreen() {
         <View className="flex-row justify-between items-center">
           <Text className="text-2xl font-bold text-gray-900">Flats</Text>
           <TouchableOpacity
-            onPress={() => setShowAddModal(true)}
+            onPress={() => router.push("/flats/add")}
             className="bg-blue-600 px-4 py-2 rounded-lg flex-row items-center"
           >
             <IconSymbol name="plus" size={20} color="#FFFFFF" />
@@ -253,10 +251,6 @@ export function FlatsScreen() {
         </>
       )}
 
-      <AddFlatModal
-        visible={showAddModal}
-        onClose={() => setShowAddModal(false)}
-      />
     </SafeAreaView>
   );
 }

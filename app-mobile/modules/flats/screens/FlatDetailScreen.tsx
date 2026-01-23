@@ -1,9 +1,6 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { EditFlatModal } from "@/modules/flats/components/EditFlatModal";
 import { useFlatDetailQuery } from "@/modules/flats/hooks/useFlatDetailQuery";
 import { AddPaymentModal } from "@/modules/payments/components/AddPaymentModal";
-import { AddResidentModal } from "@/modules/residents/components/AddResidentModal";
-import { AddVehicleModal } from "@/modules/vehicles/components/AddVehicleModal";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -24,9 +21,6 @@ export function FlatDetailScreen({ flatId }: FlatDetailScreenProps) {
   const insets = useSafeAreaInsets();
 
   // Modal states
-  const [showEditFlatModal, setShowEditFlatModal] = useState(false);
-  const [showAddResidentModal, setShowAddResidentModal] = useState(false);
-  const [showAddVehicleModal, setShowAddVehicleModal] = useState(false);
   const [showAddPaymentModal, setShowAddPaymentModal] = useState(false);
 
   // Fetch flat details using React Query
@@ -186,7 +180,7 @@ export function FlatDetailScreen({ flatId }: FlatDetailScreenProps) {
               Residents ({residents.length})
             </Text>
             <TouchableOpacity
-              onPress={() => setShowAddResidentModal(true)}
+              onPress={() => router.push(`/residents/add?flatId=${flatId}`)}
               className="bg-blue-600 px-3 py-1.5 rounded-lg flex-row items-center"
             >
               <IconSymbol name="plus" size={16} color="#FFFFFF" />
@@ -254,7 +248,7 @@ export function FlatDetailScreen({ flatId }: FlatDetailScreenProps) {
               Vehicles ({vehicles.filter((v) => v.status === "active").length})
             </Text>
             <TouchableOpacity
-              onPress={() => setShowAddVehicleModal(true)}
+              onPress={() => router.push(`/vehicles/add?flatId=${flatId}`)}
               className="bg-blue-600 px-3 py-1.5 rounded-lg flex-row items-center"
             >
               <IconSymbol name="plus" size={16} color="#FFFFFF" />
@@ -410,7 +404,7 @@ export function FlatDetailScreen({ flatId }: FlatDetailScreenProps) {
           style={{ paddingBottom: Math.max(insets.bottom, 24) }}
         >
           <TouchableOpacity
-            onPress={() => setShowEditFlatModal(true)}
+            onPress={() => router.push(`/flats/edit/${flatId}`)}
             className="bg-blue-600 rounded-lg py-4 items-center mb-3"
           >
             <Text className="text-white font-semibold text-lg">Edit Flat</Text>
@@ -419,23 +413,7 @@ export function FlatDetailScreen({ flatId }: FlatDetailScreenProps) {
       </ScrollView>
 
       {/* Modals */}
-      <EditFlatModal
-        visible={showEditFlatModal}
-        onClose={() => setShowEditFlatModal(false)}
-        flat={flat}
-      />
 
-      <AddResidentModal
-        visible={showAddResidentModal}
-        onClose={() => setShowAddResidentModal(false)}
-        flatId={flatId}
-      />
-
-      <AddVehicleModal
-        visible={showAddVehicleModal}
-        onClose={() => setShowAddVehicleModal(false)}
-        flatId={flatId}
-      />
 
       <AddPaymentModal
         visible={showAddPaymentModal}

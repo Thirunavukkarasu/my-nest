@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import "../global.css";
 
@@ -54,10 +55,11 @@ export default function RootLayout() {
   }, []); // Empty deps - only run once on mount
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <KeyboardProvider>
-        <ThemeProvider value={theme}>
-          <Stack>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <KeyboardProvider>
+          <ThemeProvider value={theme}>
+            <Stack>
           <Stack.Screen name="index" options={indexScreenOptions} />
           <Stack.Screen name="login" options={loginScreenOptions} />
 
@@ -77,5 +79,6 @@ export default function RootLayout() {
         </ThemeProvider>
       </KeyboardProvider>
     </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }

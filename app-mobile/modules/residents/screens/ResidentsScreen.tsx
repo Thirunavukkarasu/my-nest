@@ -1,12 +1,11 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { AddResidentModal } from "@/modules/residents/components/AddResidentModal";
 import { useResidentsQuery } from "@/modules/residents/hooks/useResidentsQuery";
 import { Resident } from "@/types";
 import {
   LegendList,
   LegendListRenderItemProps,
 } from "@legendapp/list";
-import { useState } from "react";
+import * as ExpoRouter from "expo-router";
 import {
   ActivityIndicator,
   Text,
@@ -16,7 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export function ResidentsScreen() {
-  const [showAddModal, setShowAddModal] = useState(false);
+  const router = (ExpoRouter as any).useRouter();
 
   // Fetch residents using React Query
   const {
@@ -72,7 +71,7 @@ export function ResidentsScreen() {
         <View className="flex-row justify-between items-center">
           <Text className="text-2xl font-bold text-gray-900">Residents</Text>
           <TouchableOpacity
-            onPress={() => setShowAddModal(true)}
+            onPress={() => router.push("/residents/add")}
             className="bg-green-600 px-4 py-2 rounded-lg flex-row items-center"
           >
             <IconSymbol name="plus" size={20} color="#FFFFFF" />
@@ -204,10 +203,6 @@ export function ResidentsScreen() {
         />
       )}
 
-      <AddResidentModal
-        visible={showAddModal}
-        onClose={() => setShowAddModal(false)}
-      />
     </SafeAreaView>
   );
 }
