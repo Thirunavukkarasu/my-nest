@@ -1,5 +1,5 @@
 /**
  * Admin Flats Screen
- * Re-exports the main flats screen component
+ * Re-exports the flats screen component from modules
  */
-export { default } from "../flats";
+export { FlatsScreen as default } from "@/modules/flats";

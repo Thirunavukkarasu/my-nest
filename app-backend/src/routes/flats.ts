@@ -26,7 +26,8 @@ router.get('/:id', async (req, res) => {
             where: (flats, { eq }) => eq(flats.flatId, id),
             with: {
                 residents: true,
-                ledgerEntries: true
+                ledgerEntries: true,
+                vehicles: true
             }
         });
 

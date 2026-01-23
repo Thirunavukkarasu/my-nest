@@ -1,5 +1,5 @@
 /**
- * Admin Payments Screen
- * Re-exports the ledger screen component
+ * Admin Ledger Screen
+ * Re-exports the ledger screen component from modules
  */
-export { default } from "../ledger";
+export { LedgerScreen as default } from "@/modules/ledger";

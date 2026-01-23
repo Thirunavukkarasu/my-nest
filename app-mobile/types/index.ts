@@ -17,6 +17,9 @@ export interface Resident {
   email?: string;
   type: ResidentType;
   flatId: string;
+  dateOfBirth?: string;
+  relation?: 'self' | 'spouse' | 'child' | 'parent' | 'sibling' | 'other';
+  ageCategory?: 'kid' | 'adult' | 'senior_citizen';
   createdAt: string;
   updatedAt: string;
 }
@@ -68,5 +71,23 @@ export interface Notice {
   createdAt: string;
   updatedAt: string;
   expiresAt?: string;
+}
+
+export type VehicleType = 'car' | 'bike' | 'scooty' | 'bicycle';
+export type FuelType = 'petrol' | 'diesel' | 'electric' | 'none';
+
+export interface Vehicle {
+  id: string;
+  flatId: string;
+  residentId?: string;
+  vehicleType: VehicleType;
+  fuelType?: FuelType;
+  registrationNumber?: string;
+  make?: string;
+  model?: string;
+  color?: string;
+  status: 'active' | 'archived' | 'removed';
+  createdAt: string;
+  updatedAt: string;
 }
 

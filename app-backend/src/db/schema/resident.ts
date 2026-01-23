@@ -3,6 +3,7 @@ import { boolean, date, index, integer, pgTable, serial, timestamp, varchar } fr
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { flatsTable } from "./flat";
+import { vehiclesTable } from "./vehicle";
 
 export const residentsTable = pgTable("residents", {
     residentId: serial("resident_id").primaryKey(),
@@ -12,6 +13,8 @@ export const residentsTable = pgTable("residents", {
     email: varchar("email", { length: 100 }).unique(),
     phone: varchar("phone", { length: 20 }),
     dateOfBirth: date("date_of_birth"), // For age calculation (senior citizens, minors)
+    relation: varchar("relation", { length: 20 }), // Relationship to primary tenant: 'self', 'spouse', 'child', 'parent', 'sibling', 'other'
+    ageCategory: varchar("age_category", { length: 20 }), // Calculated: 'kid' (<18), 'adult' (18-59), 'senior_citizen' (60+)
     residentType: varchar("resident_type", { length: 10 }).default("tenant"), // 'owner' | 'tenant'
     status: varchar("status", { length: 20 }).default("active").notNull(), // 'active' | 'archived' | 'pending' | 'inactive'
     leaseStartDate: date("lease_start_date").notNull(),
@@ -32,14 +35,17 @@ export const residentsTable = pgTable("residents", {
     flatStatusIdx: index("residents_flat_status_idx").on(table.flatId, table.status),
 }));
 
-export const residentsRelations = relations(residentsTable, ({ one }) => ({
+export const residentsRelations = relations(residentsTable, ({ one, many }) => ({
     flat: one(flatsTable, { fields: [residentsTable.flatId], references: [flatsTable.flatId] }),
+    vehicles: many(vehiclesTable), // Vehicles owned by this resident
 }));
 
 
 export const residentSchema = createInsertSchema(residentsTable, {
     residentType: z.enum(["owner", "tenant"]).default("tenant"),
     status: z.enum(["active", "archived", "pending", "inactive"]).default("active"),
+    relation: z.enum(["self", "spouse", "child", "parent", "sibling", "other"]).optional(),
+    ageCategory: z.enum(["kid", "adult", "senior_citizen"]).optional(),
 });
 export type ResidentSchema = z.infer<typeof residentSchema>;
 

@@ -4,6 +4,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { ledgerTable } from "./ledger";
 import { residentsTable } from "./resident";
+import { vehiclesTable } from "./vehicle";
 
 // Flats Table
 export const flatsTable = pgTable("flats", {
@@ -25,6 +26,7 @@ export const flatsTable = pgTable("flats", {
 export const flatsRelations = relations(flatsTable, ({ many }) => ({
     residents: many(residentsTable),
     ledgerEntries: many(ledgerTable), // Ledger entries for this flat (credits/debits)
+    vehicles: many(vehiclesTable), // Vehicles associated with this flat
 }));
 
 export const flatSchema = createInsertSchema(flatsTable);

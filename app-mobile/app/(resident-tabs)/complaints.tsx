@@ -1,5 +1,5 @@
 /**
  * Resident Complaints Screen
- * Re-exports the main complaints screen component
+ * Re-exports the complaints screen component from modules
  */
-export { default } from "../complaints";
+export { ComplaintsScreen as default } from "@/modules/complaints";

@@ -8,6 +8,24 @@ import { customPaginate } from '../lib/customPaginate';
 const router = express.Router();
 express.json();
 
+// Helper function to calculate age category from date of birth
+function calculateAgeCategory(dateOfBirth: string | null | undefined): 'kid' | 'adult' | 'senior_citizen' | null {
+    if (!dateOfBirth) return null;
+    
+    const birthDate = new Date(dateOfBirth);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    
+    if (age < 18) return 'kid';
+    if (age >= 60) return 'senior_citizen';
+    return 'adult';
+}
+
 // GET /api/residents - List residents with pagination
 router.post('/', async (req, res) => {
     try {
@@ -38,6 +56,12 @@ router.post('/', async (req, res) => {
 router.post('/mutate', async (req, res) => {
     try {
         const body = req.body;
+        
+        // Auto-calculate ageCategory from dateOfBirth if not provided
+        if (body.dateOfBirth && !body.ageCategory) {
+            body.ageCategory = calculateAgeCategory(body.dateOfBirth);
+        }
+        
         const validatedData = residentSchema.parse(body);
 
         const [newResident] = await db.insert(residentsTable)
@@ -104,6 +128,11 @@ router.put('/mutate', async (req, res) => {
             });
         }
 
+        // Auto-calculate ageCategory from dateOfBirth if dateOfBirth is being updated
+        if (updateFields.dateOfBirth && !updateFields.ageCategory) {
+            updateFields.ageCategory = calculateAgeCategory(updateFields.dateOfBirth);
+        }
+        
         const updateData = { ...updateFields, residentId };
         const validatedData = residentSchema.parse(updateData);
 

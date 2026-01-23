@@ -1,6 +1,4 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { adaptPayments } from "@/lib/adapters";
-import { apiClient } from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 import { Payment } from "@/types";
 import { useEffect, useState } from "react";
@@ -14,12 +12,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { usePaymentsQuery } from "../hooks/usePaymentsQuery";
 
-export default function PaymentsScreen() {
+export function PaymentsScreen() {
   const isImpersonating = useAuthStore((state) => state.isImpersonating);
   const impersonatedFlatId = useAuthStore((state) => state.impersonatedFlatId);
-  const [payments, setPayments] = useState<Payment[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [filter, setFilter] = useState<"all" | "maintenance" | "payout">("all");
   const [newPayment, setNewPayment] = useState({
@@ -30,9 +27,12 @@ export default function PaymentsScreen() {
     month: "",
   });
 
-  useEffect(() => {
-    loadPayments();
-  }, [impersonatedFlatId, isImpersonating]);
+  // Fetch payments using React Query
+  const {
+    data: payments = [],
+    isLoading: loading,
+    error,
+  } = usePaymentsQuery();
 
   useEffect(() => {
     if (isImpersonating && impersonatedFlatId) {
@@ -42,21 +42,6 @@ export default function PaymentsScreen() {
       }));
     }
   }, [impersonatedFlatId, isImpersonating]);
-
-  const loadPayments = async () => {
-    try {
-      setLoading(true);
-      // Note: This appears to be a mock/placeholder screen
-      // Payments are typically handled through ledger entries
-      // For now, we'll use empty array and filter client-side if needed
-      setPayments([]);
-    } catch (error) {
-      Alert.alert("Error", "Failed to load payments");
-      console.error("Error loading payments:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleAddPayment = () => {
     if (
@@ -81,10 +66,11 @@ export default function PaymentsScreen() {
       updatedAt: new Date().toISOString(),
     };
 
-    setPayments([...payments, payment]);
+    // Note: This is a placeholder - payments should be handled through ledger entries
+    // For now, we'll just show success message
     setNewPayment({
       residentId: "",
-      flatId: "",
+      flatId: impersonatedFlatId?.toString() || "",
       amount: "",
       type: "maintenance",
       month: "",
@@ -94,9 +80,9 @@ export default function PaymentsScreen() {
   };
 
   // Filter payments by flatId when impersonating
-  let displayPayments = payments;
+  let displayPayments = payments || [];
   if (isImpersonating && impersonatedFlatId) {
-    displayPayments = payments.filter(
+    displayPayments = displayPayments.filter(
       (p) => p.flatId === impersonatedFlatId.toString()
     );
   }
@@ -104,11 +90,11 @@ export default function PaymentsScreen() {
   const filteredPayments =
     filter === "all" ? displayPayments : displayPayments.filter((p) => p.type === filter);
 
-  const totalMaintenance = payments
+  const totalMaintenance = (payments || [])
     .filter((p) => p.type === "maintenance" && p.status === "paid")
     .reduce((sum, p) => sum + p.amount, 0);
 
-  const totalPayouts = payments
+  const totalPayouts = (payments || [])
     .filter((p) => p.type === "payout" && p.status === "paid")
     .reduce((sum, p) => sum + p.amount, 0);
 

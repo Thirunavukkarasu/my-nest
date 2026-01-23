@@ -1,13 +1,12 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { AddComplaintModal } from "@/modules/complaints/components/AddComplaintModal";
 import { useAuthStore } from "@/store/authStore";
 import { Complaint } from "@/types";
 import { useEffect, useState } from "react";
 import {
   Alert,
-  Modal,
   ScrollView,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -26,7 +25,7 @@ const mockComplaints: Complaint[] = [
   },
 ];
 
-export default function ComplaintsScreen() {
+export function ComplaintsScreen() {
   const isImpersonating = useAuthStore((state) => state.isImpersonating);
   const impersonatedFlatId = useAuthStore((state) => state.impersonatedFlatId);
   const [complaints, setComplaints] = useState<Complaint[]>(mockComplaints);
@@ -34,13 +33,6 @@ export default function ComplaintsScreen() {
   const [filter, setFilter] = useState<"all" | "open" | "resolved" | "closed">(
     "all"
   );
-  const [loading, setLoading] = useState(false);
-  const [newComplaint, setNewComplaint] = useState({
-    residentId: "",
-    flatId: impersonatedFlatId?.toString() || "",
-    title: "",
-    description: "",
-  });
 
   useEffect(() => {
     // Filter complaints by flatId when impersonating
@@ -48,40 +40,29 @@ export default function ComplaintsScreen() {
       setComplaints(
         mockComplaints.filter((c) => c.flatId === impersonatedFlatId.toString())
       );
-      setNewComplaint((prev) => ({
-        ...prev,
-        flatId: impersonatedFlatId.toString(),
-      }));
     } else {
       setComplaints(mockComplaints);
     }
   }, [impersonatedFlatId, isImpersonating]);
 
-  const handleAddComplaint = () => {
-    if (
-      !newComplaint.residentId ||
-      !newComplaint.flatId ||
-      !newComplaint.title ||
-      !newComplaint.description
-    ) {
-      Alert.alert("Error", "Please fill in all fields");
-      return;
-    }
-
+  const handleAddComplaint = (complaintData: {
+    residentId: string;
+    flatId: string;
+    title: string;
+    description: string;
+  }) => {
     const complaint: Complaint = {
       id: Date.now().toString(),
-      residentId: newComplaint.residentId,
-      flatId: newComplaint.flatId,
-      title: newComplaint.title,
-      description: newComplaint.description,
+      residentId: complaintData.residentId,
+      flatId: complaintData.flatId,
+      title: complaintData.title,
+      description: complaintData.description,
       status: "open",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
     setComplaints([...complaints, complaint]);
-    setNewComplaint({ residentId: "", flatId: "", title: "", description: "" });
-    setShowAddModal(false);
     Alert.alert("Success", "Complaint submitted successfully");
   };
 
@@ -185,96 +166,11 @@ export default function ComplaintsScreen() {
         ))}
       </ScrollView>
 
-      <Modal
+      <AddComplaintModal
         visible={showAddModal}
-        animationType="slide"
-        transparent
-        onRequestClose={() => setShowAddModal(false)}
-      >
-        <View className="flex-1 bg-black/50 justify-end">
-          <View className="bg-white rounded-t-3xl p-6 max-h-[90%]">
-            <ScrollView>
-              <Text className="text-2xl font-bold text-gray-900 mb-4">
-                Submit Complaint
-              </Text>
-
-              <View className="mb-4">
-                <Text className="text-sm font-medium text-gray-700 mb-2">
-                  Resident ID
-                </Text>
-                <TextInput
-                  className="border border-gray-300 rounded-lg px-4 py-3 text-base bg-white"
-                  placeholder="Enter resident ID"
-                  value={newComplaint.residentId}
-                  onChangeText={(text) =>
-                    setNewComplaint({ ...newComplaint, residentId: text })
-                  }
-                />
-              </View>
-
-              <View className="mb-4">
-                <Text className="text-sm font-medium text-gray-700 mb-2">
-                  Flat ID
-                </Text>
-                <TextInput
-                  className="border border-gray-300 rounded-lg px-4 py-3 text-base bg-white"
-                  placeholder="Enter flat ID"
-                  value={newComplaint.flatId}
-                  onChangeText={(text) =>
-                    setNewComplaint({ ...newComplaint, flatId: text })
-                  }
-                />
-              </View>
-
-              <View className="mb-4">
-                <Text className="text-sm font-medium text-gray-700 mb-2">
-                  Title
-                </Text>
-                <TextInput
-                  className="border border-gray-300 rounded-lg px-4 py-3 text-base bg-white"
-                  placeholder="Enter complaint title"
-                  value={newComplaint.title}
-                  onChangeText={(text) =>
-                    setNewComplaint({ ...newComplaint, title: text })
-                  }
-                />
-              </View>
-
-              <View className="mb-6">
-                <Text className="text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </Text>
-                <TextInput
-                  className="border border-gray-300 rounded-lg px-4 py-3 text-base bg-white"
-                  placeholder="Describe your complaint"
-                  value={newComplaint.description}
-                  onChangeText={(text) =>
-                    setNewComplaint({ ...newComplaint, description: text })
-                  }
-                  multiline
-                  numberOfLines={4}
-                  textAlignVertical="top"
-                />
-              </View>
-
-              <View className="flex-row gap-3">
-                <TouchableOpacity
-                  onPress={() => setShowAddModal(false)}
-                  className="flex-1 bg-gray-200 rounded-lg py-3 items-center"
-                >
-                  <Text className="text-gray-900 font-semibold">Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={handleAddComplaint}
-                  className="flex-1 bg-red-600 rounded-lg py-3 items-center"
-                >
-                  <Text className="text-white font-semibold">Submit</Text>
-                </TouchableOpacity>
-              </View>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
+        onClose={() => setShowAddModal(false)}
+        onSubmit={handleAddComplaint}
+      />
     </View>
   );
 }

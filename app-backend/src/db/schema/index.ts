@@ -10,4 +10,5 @@ export { residentSchema, residentsRelations, residentsTable } from "./resident";
 export { rolePermissionsRelations, rolePermissionsTable } from "./rolePermission";
 export { roleSchema, rolesRelations, rolesTable } from "./role";
 export { userSchema, usersRelations, usersTable } from "./user";
+export { vehicleSchema, vehiclesRelations, vehiclesTable } from "./vehicle";
 

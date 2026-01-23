@@ -1,5 +1,5 @@
 /**
  * Admin Residents Screen
- * Re-exports the main residents screen component
+ * Re-exports the residents screen component from modules
  */
-export { default } from "../residents";
+export { ResidentsScreen as default } from "@/modules/residents";

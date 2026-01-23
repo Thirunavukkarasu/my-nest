@@ -5,6 +5,7 @@ import ledgerRouter from '../src/routes/ledger';
 import loginRouter from '../src/routes/login';
 import registerRouter from '../src/routes/register';
 import residentsRouter from '../src/routes/residents';
+import vehiclesRouter from '../src/routes/vehicles';
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/api/login', loginRouter);
 app.use('/api/flats', authenticateToken, flatsRouter);
 app.use('/api/residents', authenticateToken, residentsRouter);
 app.use('/api/ledger', authenticateToken, ledgerRouter);
+app.use('/api/vehicles', authenticateToken, vehiclesRouter);
 
 // For Vercel serverless functions (production), export the app (Vercel handles HTTP)
 // For local development (`pnpm dev` or `vc dev`), start the server

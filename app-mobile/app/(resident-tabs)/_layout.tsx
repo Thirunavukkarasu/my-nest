@@ -4,10 +4,12 @@
  */
 import { Tabs } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Platform, Text, TouchableOpacity, View } from "react-native";
 
+import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { adaptFlats, adaptResidents } from "@/lib/adapters";
 import { apiClient } from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
@@ -17,27 +19,21 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 // Icon functions defined outside component to prevent recreation
 // These must be functions (not memoized components) for React Navigation
-const HomeIcon = ({ color }: { color: string }) => (
-  <IconSymbol size={28} name="house.fill" color={color} />
+const HomeIcon = ({ color, focused }: { color: string; focused: boolean }) => (
+  <IconSymbol size={focused ? 26 : 24} name="house.fill" color={color} />
 );
-const MyFlatIcon = ({ color }: { color: string }) => (
-  <IconSymbol size={28} name="building.2.fill" color={color} />
+const MyFlatIcon = ({ color, focused }: { color: string; focused: boolean }) => (
+  <IconSymbol size={focused ? 26 : 24} name="building.2.fill" color={color} />
 );
-const PaymentsIcon = ({ color }: { color: string }) => (
-  <IconSymbol size={28} name="creditcard.fill" color={color} />
+const PaymentsIcon = ({ color, focused }: { color: string; focused: boolean }) => (
+  <IconSymbol size={focused ? 26 : 24} name="creditcard.fill" color={color} />
 );
-const ComplaintsIcon = ({ color }: { color: string }) => (
-  <IconSymbol size={28} name="exclamationmark.triangle.fill" color={color} />
+const ComplaintsIcon = ({ color, focused }: { color: string; focused: boolean }) => (
+  <IconSymbol size={focused ? 26 : 24} name="exclamationmark.triangle.fill" color={color} />
 );
-const ProfileIcon = ({ color }: { color: string }) => (
-  <IconSymbol size={28} name="person.fill" color={color} />
+const ProfileIcon = ({ color, focused }: { color: string; focused: boolean }) => (
+  <IconSymbol size={focused ? 26 : 24} name="person.fill" color={color} />
 );
-
-// Move all options outside component to prevent recreation on each render
-const screenOptions = {
-  tabBarActiveTintColor: Colors.light.tint,
-  headerShown: false,
-};
 
 const homeOptions = {
   title: "Home",
@@ -73,6 +69,8 @@ export default function ResidentTabLayout() {
   const [flat, setFlat] = useState<Flat | null>(null);
   const [residents, setResidents] = useState<Resident[]>([]);
   const [loadingFlatData, setLoadingFlatData] = useState(false);
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
 
   const roleName = user?.roleName?.toLowerCase();
   const isAdmin =
@@ -179,7 +177,44 @@ export default function ResidentTabLayout() {
           </View>
         </View>
       )}
-      <Tabs screenOptions={screenOptions}>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarActiveTintColor: isDark ? Colors.dark.tint : Colors.light.tint,
+          tabBarInactiveTintColor: isDark ? Colors.dark.tabIconDefault : Colors.light.tabIconDefault,
+          tabBarButton: HapticTab,
+          tabBarHideOnKeyboard: true,
+          tabBarStyle: {
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: isDark ? "#1F2937" : "#FFFFFF",
+            borderTopWidth: 0,
+            elevation: 8,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            height: Platform.OS === "ios" ? 88 : 70,
+            paddingBottom: Platform.OS === "ios" ? 28 : 12,
+            paddingTop: 8,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+          },
+          tabBarLabelStyle: {
+            fontSize: 11,
+            fontWeight: "600",
+            marginTop: 4,
+          },
+          tabBarIconStyle: {
+            marginTop: 4,
+          },
+          tabBarItemStyle: {
+            paddingVertical: 4,
+          },
+        }}
+      >
         <Tabs.Screen name="index" options={homeOptions} />
         <Tabs.Screen name="my-flat" options={myFlatOptions} />
         <Tabs.Screen name="payments" options={paymentsOptions} />

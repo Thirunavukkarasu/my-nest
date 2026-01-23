@@ -55,14 +55,14 @@ export default function AdminDashboardScreen() {
       title: "Flats",
       description: "Manage all flats and their details",
       icon: "building.2.fill",
-      route: "/flats",
+      route: "/(admin-tabs)/flats",
       color: "bg-blue-500",
     },
     {
       title: "Residents",
       description: "Add and manage owners & tenants",
       icon: "person.2.fill",
-      route: "/residents",
+      route: "/(admin-tabs)/residents",
       color: "bg-green-500",
     },
     {
@@ -71,13 +71,6 @@ export default function AdminDashboardScreen() {
       icon: "creditcard.fill",
       route: "/(admin-tabs)/ledger",
       color: "bg-purple-500",
-    },
-    {
-      title: "Complaints",
-      description: "Handle resident complaints",
-      icon: "exclamationmark.triangle.fill",
-      route: "/complaints",
-      color: "bg-red-500",
     },
   ];
 

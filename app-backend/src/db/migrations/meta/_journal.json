@@ -71,6 +71,13 @@
       "when": 1767620206299,
       "tag": "0009_ancient_darkstar",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1769150273441,
+      "tag": "0010_massive_blade",
+      "breakpoints": true
     }
   ]
 }

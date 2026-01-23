@@ -188,6 +188,39 @@ class ApiClient {
         });
     }
 
+    // Vehicles API
+    async getVehicles(params: PaginationParams = {}): Promise<ApiResponse<PaginatedResponse<any>>> {
+        return this.request<PaginatedResponse<any>>('/api/vehicles', {
+            method: 'POST',
+            body: JSON.stringify({
+                page: params.page || 1,
+                limit: params.limit || 10,
+                searchCriterias: params.searchCriterias || [],
+                sortCriterias: params.sortCriterias || [],
+            }),
+        });
+    }
+
+    async createVehicle(vehicleData: any): Promise<ApiResponse<any>> {
+        return this.request('/api/vehicles/mutate', {
+            method: 'POST',
+            body: JSON.stringify(vehicleData),
+        });
+    }
+
+    async updateVehicle(vehicleId: number, vehicleData: any): Promise<ApiResponse<any>> {
+        return this.request('/api/vehicles/mutate', {
+            method: 'PUT',
+            body: JSON.stringify({ vehicleId, ...vehicleData }),
+        });
+    }
+
+    async deleteVehicle(vehicleId: number): Promise<ApiResponse<any>> {
+        return this.request(`/api/vehicles/mutate/${vehicleId}`, {
+            method: 'DELETE',
+        });
+    }
+
     // Ledger API
     async getLedger(params: PaginationParams = {}): Promise<ApiResponse<PaginatedResponse<any>>> {
         return this.request<PaginatedResponse<any>>('/api/ledger', {

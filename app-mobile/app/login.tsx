@@ -5,13 +5,15 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import {
+  KeyboardAvoidingView,
+  KeyboardAwareScrollView,
+} from "react-native-keyboard-controller";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -82,11 +84,11 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      className="flex-1 bg-white"
-    >
-      <View className="flex-1 justify-center px-6">
+    <KeyboardAvoidingView className="flex-1 bg-white">
+      <KeyboardAwareScrollView
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+        className="px-6"
+      >
         <View className="mb-8">
           <Text className="text-4xl font-bold text-gray-900 mb-2">
             RR Enclave
@@ -137,7 +139,7 @@ export default function LoginScreen() {
             <Text className="text-white text-lg font-semibold">Login</Text>
           )}
         </TouchableOpacity>
-      </View>
+      </KeyboardAwareScrollView>
     </KeyboardAvoidingView>
   );
 }

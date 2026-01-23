@@ -3,7 +3,7 @@
  * Convert API response types to mobile app types
  */
 
-import { Flat, Payment, Resident } from '@/types';
+import { Flat, Payment, Resident, Vehicle } from '@/types';
 
 // API Response Types (matching database schema)
 interface ApiFlat {
@@ -30,6 +30,11 @@ interface ApiResident {
     lastName: string;
     email?: string;
     phone?: string;
+    dateOfBirth?: string;
+    relation?: 'self' | 'spouse' | 'child' | 'parent' | 'sibling' | 'other';
+    ageCategory?: 'kid' | 'adult' | 'senior_citizen';
+    residentType?: 'owner' | 'tenant';
+    status?: string;
     leaseStartDate: string;
     leaseEndDate?: string;
     isPrimaryTenant?: boolean;
@@ -75,13 +80,19 @@ export function adaptFlat(apiFlat: ApiFlat): Flat {
  * Convert API Resident to Mobile Resident
  */
 export function adaptResident(apiResident: ApiResident): Resident {
+    // Determine type: use residentType if available, otherwise fall back to isPrimaryTenant
+    const type: 'owner' | 'tenant' = apiResident.residentType === 'owner' || apiResident.isPrimaryTenant ? 'owner' : 'tenant';
+
     return {
         id: apiResident.residentId.toString(),
         name: `${apiResident.firstName} ${apiResident.lastName}`,
         phone: apiResident.phone || '',
         email: apiResident.email,
-        type: apiResident.isPrimaryTenant ? 'owner' : 'tenant',
+        type,
         flatId: apiResident.flatId.toString(),
+        dateOfBirth: apiResident.dateOfBirth,
+        relation: apiResident.relation,
+        ageCategory: apiResident.ageCategory,
         createdAt: apiResident.createdAt,
         updatedAt: apiResident.updatedAt,
     };
@@ -136,5 +147,50 @@ export function adaptResidents(apiResidents: ApiResident[]): Resident[] {
  */
 export function adaptPayments(apiPayments: ApiPayment[]): Payment[] {
     return apiPayments.map(adaptPayment);
+}
+
+// Vehicle API Types
+interface ApiVehicle {
+    vehicleId: number;
+    flatId: number;
+    residentId?: number;
+    vehicleType: 'car' | 'bike' | 'scooty' | 'bicycle';
+    fuelType?: 'petrol' | 'diesel' | 'electric' | 'none';
+    registrationNumber?: string;
+    make?: string;
+    model?: string;
+    color?: string;
+    status: 'active' | 'archived' | 'removed';
+    createdAt: string;
+    updatedAt: string;
+    flat?: ApiFlat;
+    resident?: ApiResident;
+}
+
+/**
+ * Convert API Vehicle to Mobile Vehicle
+ */
+export function adaptVehicle(apiVehicle: ApiVehicle): Vehicle {
+    return {
+        id: apiVehicle.vehicleId.toString(),
+        flatId: apiVehicle.flatId.toString(),
+        residentId: apiVehicle.residentId?.toString(),
+        vehicleType: apiVehicle.vehicleType,
+        fuelType: apiVehicle.fuelType,
+        registrationNumber: apiVehicle.registrationNumber,
+        make: apiVehicle.make,
+        model: apiVehicle.model,
+        color: apiVehicle.color,
+        status: apiVehicle.status,
+        createdAt: apiVehicle.createdAt,
+        updatedAt: apiVehicle.updatedAt,
+    };
+}
+
+/**
+ * Convert array of API Vehicles to Mobile Vehicles
+ */
+export function adaptVehicles(apiVehicles: ApiVehicle[]): Vehicle[] {
+    return apiVehicles.map(adaptVehicle);
 }
 
